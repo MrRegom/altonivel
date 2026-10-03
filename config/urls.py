@@ -17,8 +17,8 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
-    # En producción solo se publica el logo. Los PDF/XML de facturas se
-    # descargan por el panel, que exige haber iniciado sesión.
+    # En producción solo se publican el logo y las fotos de productos. Los
+    # PDF/XML de facturas se descargan por el panel, que exige sesión.
     urlpatterns += [
-        re_path(r"^media/(?P<path>empresa/.+)$", serve, {"document_root": settings.MEDIA_ROOT}),
+        re_path(r"^media/(?P<path>(?:empresa|productos)/.+)$", serve, {"document_root": settings.MEDIA_ROOT}),
     ]

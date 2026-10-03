@@ -169,7 +169,7 @@ def productos_lista(request):
 @login_required
 def producto_form(request, pk=None):
     producto = get_object_or_404(Producto, pk=pk) if pk else None
-    form = ProductoForm(request.POST or None, instance=producto)
+    form = ProductoForm(request.POST or None, request.FILES or None, instance=producto)
     if request.method == "POST" and form.is_valid():
         producto = form.save()
         messages.success(request, f"Producto «{producto.nombre}» guardado.")
@@ -215,6 +215,7 @@ def _productos_json():
             "nombre": p.nombre,
             "precio": int(p.precio_neto),
             "exento": p.exento,
+            "imagen": p.imagen.url if p.imagen else "",
         }
         for p in Producto.objects.filter(activo=True)
     }

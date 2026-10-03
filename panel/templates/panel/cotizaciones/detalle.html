@@ -38,7 +38,7 @@
           <tbody>
           {% for i in c.items.all %}
             <tr>
-              <td class="fuerte">{{ i.descripcion }} {% if i.exento %}<span class="etiqueta">Exento</span>{% endif %}</td>
+              <td class="fuerte"><div class="con-foto">{% foto_producto i.producto "sm" %}<div>{{ i.descripcion }} {% if i.exento %}<span class="etiqueta">Exento</span>{% endif %}</div></div></td>
               <td class="num">{{ i.cantidad|cantidad }}</td>
               <td class="num">{{ i.precio_unitario|clp }}</td>
               <td class="num fuerte">{{ i.subtotal|clp }}</td>

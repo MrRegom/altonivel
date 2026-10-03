@@ -2,7 +2,10 @@
 <tr class="item{% if f.DELETE.value %} oculto{% endif %}">
   <td class="col-prod" data-lbl="Producto">
     {% for h in f.hidden_fields %}{{ h }}{% endfor %}
-    {{ f.producto }}
+    <div class="item-prod">
+      <span class="item-foto">{% foto_producto f.instance.producto "xs" %}</span>
+      {{ f.producto }}
+    </div>
     {{ f.producto.errors }}
   </td>
   <td class="col-desc" data-lbl="Descripción">{{ f.descripcion }}{{ f.descripcion.errors }}</td>

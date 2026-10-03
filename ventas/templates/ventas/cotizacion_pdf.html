@@ -74,7 +74,14 @@
     <tbody>
       {% for item in c.items.all %}
       <tr>
-        <td>{{ item.descripcion }}{% if item.exento %} <span class="exento">EXENTO</span>{% endif %}</td>
+        <td>
+          {% if hay_fotos %}
+          <table><tr>
+            <td style="width: 46px; padding: 0; border: 0;">{% if item.producto.imagen %}<img src="{{ item.producto.imagen.url }}" style="width: 38px; height: 38px;">{% endif %}</td>
+            <td style="padding: 0; border: 0; vertical-align: middle;">{{ item.descripcion }}{% if item.exento %} <span class="exento">EXENTO</span>{% endif %}</td>
+          </tr></table>
+          {% else %}{{ item.descripcion }}{% if item.exento %} <span class="exento">EXENTO</span>{% endif %}{% endif %}
+        </td>
         <td class="num">{{ item.cantidad|cantidad }}</td>
         <td class="num">{{ item.precio_unitario|clp }}</td>
         <td class="num">{{ item.subtotal|clp }}</td>

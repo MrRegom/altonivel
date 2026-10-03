@@ -20,9 +20,14 @@
       {% for p in pagina %}
         <tr data-href="{% url 'panel:producto_editar' p.pk %}">
           <td class="principal-celda">
-            <a href="{% url 'panel:producto_editar' p.pk %}">{{ p.nombre }}</a>
-            {% if p.descripcion %}<span class="sub">{{ p.descripcion|truncatechars:70 }}</span>{% endif %}
-            {% if not p.activo %}<span class="badge badge--gris">Inactivo</span>{% endif %}
+            <div class="con-foto">
+              {% foto_producto p "sm" %}
+              <div>
+                <a href="{% url 'panel:producto_editar' p.pk %}">{{ p.nombre }}</a>
+                {% if p.descripcion %}<span class="sub">{{ p.descripcion|truncatechars:70 }}</span>{% endif %}
+                {% if not p.activo %}<span class="badge badge--gris">Inactivo</span>{% endif %}
+              </div>
+            </div>
           </td>
           <td class="ocultar-movil tenue">{{ p.codigo|default:"—" }}</td>
           <td>{% if p.exento %}<span class="etiqueta">Exento</span>{% else %}<span class="tenue small">Afecto</span>{% endif %}</td>

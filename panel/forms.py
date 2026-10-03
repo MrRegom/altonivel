@@ -42,9 +42,22 @@ class ClienteForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ["codigo", "nombre", "descripcion", "precio_neto", "exento", "activo"]
-        widgets = {"descripcion": forms.Textarea(attrs={"rows": 3})}
+        fields = ["codigo", "nombre", "descripcion", "precio_neto", "exento", "activo", "imagen"]
+        widgets = {
+            "descripcion": forms.Textarea(attrs={"rows": 3}),
+            "imagen": forms.FileInput(attrs={"accept": "image/*"}),
+        }
         labels = {"precio_neto": "Precio neto (sin IVA)", "codigo": "Código / SKU"}
+
+    quitar_imagen = forms.BooleanField(label="Quitar foto", required=False)
+
+    def save(self, commit=True):
+        producto = super().save(commit=False)
+        if self.cleaned_data.get("quitar_imagen") and not self.files.get("imagen"):
+            producto.imagen = None
+        if commit:
+            producto.save()
+        return producto
 
 
 class CotizacionForm(forms.ModelForm):

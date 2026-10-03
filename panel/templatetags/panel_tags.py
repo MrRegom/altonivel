@@ -141,3 +141,13 @@ def icono(nombre, clase=""):
         clase,
         mark_safe(_ICONOS.get(nombre, "")),
     )
+
+
+@register.simple_tag
+def foto_producto(producto, tam="sm"):
+    """Miniatura del producto o, si no tiene foto, un recuadro con ícono."""
+    if producto is not None and getattr(producto, "imagen", None):
+        return format_html(
+            '<img class="foto foto--{}" src="{}" alt="" loading="lazy">', tam, producto.imagen.url
+        )
+    return format_html('<span class="foto foto--{} foto--vacia">{}</span>', tam, icono("productos"))

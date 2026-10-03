@@ -402,3 +402,18 @@ dialog.modal::backdrop { background: rgba(0, 0, 0, .4); }
   .tabla .ocultar-movil { display: none; }
   .tabla th, .tabla td { padding-left: 10px; padding-right: 10px; }
 }
+
+/* ---------- Fotos de productos ---------- */
+.foto { display: inline-grid; place-items: center; flex: none; object-fit: cover; background: #fff;
+  border: 1px solid var(--borde); border-radius: var(--radio); vertical-align: middle; }
+.foto--xs { width: 32px; height: 32px; }
+.foto--sm { width: 44px; height: 44px; }
+.foto--lg { width: 160px; height: 160px; }
+.foto--vacia { background: #fafafa; color: #bdbdbd; }
+.foto--vacia svg.icono { width: 45%; height: 45%; stroke-width: 1.5; }
+.con-foto { display: flex; align-items: center; gap: 12px; }
+.con-foto > div { min-width: 0; }
+.foto-campo { display: flex; gap: 16px; align-items: flex-start; }
+.foto-campo__acciones { display: flex; flex-direction: column; gap: 8px; }
+.items .col-prod .item-prod { display: flex; gap: 8px; align-items: flex-start; }
+.items .col-prod .item-prod select { flex: 1; min-width: 0; }

@@ -114,10 +114,26 @@
     document.getElementById("t-total").textContent = clp(neto + iva + exento);
   }
 
+  // Muestra la foto del producto elegido (o el recuadro vacío)
+  var vacia = document.querySelector("#item-vacio").content.querySelector(".item-foto").innerHTML;
+  function mostrarFoto(fila, p) {
+    var caja = fila.querySelector(".item-foto");
+    if (!caja) return;
+    if (p && p.imagen) {
+      caja.innerHTML = "";
+      var img = document.createElement("img");
+      img.className = "foto foto--xs"; img.alt = ""; img.src = p.imagen;
+      caja.appendChild(img);
+    } else {
+      caja.innerHTML = vacia;
+    }
+  }
+
   function prepararFila(fila) {
     var sel = campo(fila, "producto");
     sel.addEventListener("change", function () {
       var p = productos[sel.value];
+      mostrarFoto(fila, p);
       if (!p) return;
       campo(fila, "descripcion").value = p.nombre;
       campo(fila, "precio_unitario").value = p.precio;

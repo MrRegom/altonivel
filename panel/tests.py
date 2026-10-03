@@ -229,3 +229,56 @@ class UsuariosYAccesoTests(TestCase):
         self.admin.refresh_from_db()
         self.assertEqual(self.admin.username, "16233406-9")
         self.assertTrue(self.admin.is_superuser)
+
+
+class FotosProductoTests(TestCase):
+    def setUp(self):
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        ajuste = override_settings(MEDIA_ROOT=media)
+        ajuste.enable()
+        self.addCleanup(ajuste.disable)
+        self.client.force_login(User.objects.create_superuser("11111111-1", password="x"))
+
+    @staticmethod
+    def _png(ancho=1600, alto=1200):
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+
+        buf = BytesIO()
+        Image.new("RGBA", (ancho, alto), (249, 82, 11, 255)).save(buf, "PNG")
+        return SimpleUploadedFile("tarjeta.png", buf.getvalue(), content_type="image/png")
+
+    def test_subir_foto_se_optimiza(self):
+        from PIL import Image
+
+        datos = {"nombre": "RTX", "precio_neto": "1000", "activo": "on", "imagen": self._png()}
+        self.client.post(reverse("panel:producto_nuevo"), datos)
+        p = Producto.objects.get()
+        self.assertTrue(p.imagen.name.endswith(".jpg"))
+        with Image.open(p.imagen.path) as img:
+            self.assertEqual(img.format, "JPEG")
+            self.assertLessEqual(max(img.size), 800)
+        self.assertContains(self.client.get(reverse("panel:productos")), p.imagen.url)
+
+    def test_quitar_foto(self):
+        self.client.post(reverse("panel:producto_nuevo"),
+                         {"nombre": "RTX", "precio_neto": "1000", "activo": "on", "imagen": self._png(200, 200)})
+        p = Producto.objects.get()
+        self.client.post(reverse("panel:producto_editar", args=[p.pk]),
+                         {"nombre": "RTX", "precio_neto": "1000", "activo": "on", "quitar_imagen": "on"})
+        p.refresh_from_db()
+        self.assertFalse(p.imagen)
+
+    def test_pdf_con_fotos(self):
+        self.client.post(reverse("panel:producto_nuevo"),
+                         {"nombre": "RTX", "precio_neto": "1000", "activo": "on", "imagen": self._png(300, 300)})
+        p = Producto.objects.get()
+        cliente = Cliente.objects.create(rut="76192083-9", razon_social="Demo SpA")
+        cot = Cotizacion.objects.create(cliente=cliente)
+        ItemCotizacion.objects.create(cotizacion=cot, producto=p, descripcion="RTX", precio_unitario=Decimal("1000"))
+        resp = self.client.get(reverse("panel:cotizacion_pdf", args=[cot.pk]))
+        self.assertTrue(resp.content.startswith(b"%PDF"))
+        self.assertIn(b"/Image", resp.content)

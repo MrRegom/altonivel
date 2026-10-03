@@ -29,9 +29,10 @@ def _logo_path():
 
 def cotizacion_html(cotizacion) -> str:
     empresa, logo = _logo_path()
+    hay_fotos = any(i.producto_id and i.producto.imagen for i in cotizacion.items.all())
     return render_to_string(
         "ventas/cotizacion_pdf.html",
-        {"c": cotizacion, "empresa": empresa, "logo": logo},
+        {"c": cotizacion, "empresa": empresa, "logo": logo, "hay_fotos": hay_fotos},
     )
 
 

@@ -5,10 +5,23 @@
 {% block encabezado %}{% if producto %}{{ producto.nombre }}{% else %}Nuevo producto{% endif %}{% endblock %}
 
 {% block contenido %}
-<form method="post" class="card" style="max-width:760px" novalidate>
+<form method="post" class="card" style="max-width:760px" novalidate enctype="multipart/form-data">
   {% csrf_token %}
   <div class="card__cuerpo">
     <div class="form-grid">
+      <div class="campo ancho{% if form.imagen.errors %} campo--error{% endif %}">
+        <label for="{{ form.imagen.id_for_label }}">Foto</label>
+        <div class="foto-campo">
+          <span id="foto-vista">{% foto_producto producto "lg" %}</span>
+          <div class="foto-campo__acciones">
+            <label class="btn" for="{{ form.imagen.id_for_label }}" style="margin:0">{% if producto.imagen %}Cambiar foto{% else %}Subir foto{% endif %}</label>
+            <span class="oculto">{{ form.imagen }}</span>
+            {% if producto.imagen %}<label class="check small">{{ form.quitar_imagen }} Quitar foto</label>{% endif %}
+            <div class="ayuda">JPG, PNG o WebP. Se ajusta automáticamente a 800 px.</div>
+          </div>
+        </div>
+        {{ form.imagen.errors }}
+      </div>
       {% include "panel/_campo.html" with f=form.nombre ancho=1 %}
       {% include "panel/_campo.html" with f=form.codigo %}
       {% include "panel/_campo.html" with f=form.precio_neto %}
@@ -19,7 +32,23 @@
   </div>
   <div class="card__pie form-acciones">
     <a class="btn btn--fantasma" href="{% url 'panel:productos' %}">Cancelar</a>
-    <button class="btn btn--primario" type="submit">{% icono "check" %} Guardar producto</button>
+    <button class="btn btn--primario" type="submit">Guardar producto</button>
   </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Vista previa de la foto antes de guardar
+  document.getElementById("{{ form.imagen.id_for_label }}").addEventListener("change", function () {
+    var archivo = this.files && this.files[0];
+    if (!archivo) return;
+    var img = document.createElement("img");
+    img.className = "foto foto--lg";
+    img.src = URL.createObjectURL(archivo);
+    var vista = document.getElementById("foto-vista");
+    vista.innerHTML = "";
+    vista.appendChild(img);
+  });
+</script>
 {% endblock %}
