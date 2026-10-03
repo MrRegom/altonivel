@@ -46,5 +46,5 @@ echo
 echo "==> Listo: http://$IP:$APP_PORT/"
 if ! docker compose exec -T web python manage.py shell -c "from django.contrib.auth.models import User; exit(0 if User.objects.exists() else 1)" >/dev/null 2>&1; then
   echo "    Falta crear el usuario administrador:"
-  echo "    docker compose exec web python manage.py createsuperuser"
+  echo "    docker compose exec web python manage.py admin_rut <tu-rut>"
 fi
