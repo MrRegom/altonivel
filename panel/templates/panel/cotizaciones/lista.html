@@ -1,0 +1,48 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Cotizaciones{% endblock %}
+{% block encabezado %}Cotizaciones{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>{% endblock %}
+
+{% block contenido %}
+<form class="herramientas" method="get">
+  {% if estado %}<input type="hidden" name="estado" value="{{ estado }}">{% endif %}
+  <div class="buscador">{% icono "buscar" %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por N°, cliente o RUT…"></div>
+  <div class="chips">
+    <a class="chip {% if not estado %}is-active{% endif %}" href="{% url_con estado='' pagina='' %}">Todas <span class="cuenta">{{ total }}</span></a>
+    {% for valor, nombre, n in estados %}{% if n %}
+    <a class="chip {% if estado == valor %}is-active{% endif %}" href="{% url_con estado=valor pagina='' %}">{{ nombre }} <span class="cuenta">{{ n }}</span></a>
+    {% endif %}{% endfor %}
+  </div>
+</form>
+
+<section class="card">
+  {% if pagina.object_list %}
+  <div class="tabla-wrap">
+    <table class="tabla tabla--click">
+      <thead><tr><th>N°</th><th>Cliente</th><th class="ocultar-movil">Fecha</th><th class="ocultar-movil">Válida hasta</th><th>Estado</th><th class="num">Total</th></tr></thead>
+      <tbody>
+      {% for c in pagina %}
+        <tr data-href="{% url 'panel:cotizacion_detalle' c.pk %}">
+          <td><a class="folio" href="{% url 'panel:cotizacion_detalle' c.pk %}">{{ c.numero }}</a></td>
+          <td class="principal-celda"><a href="{% url 'panel:cotizacion_detalle' c.pk %}">{{ c.cliente.razon_social }}</a><span class="sub">{{ c.cliente.rut|rut }}</span></td>
+          <td class="ocultar-movil">{{ c.fecha|date:"d/m/Y" }}</td>
+          <td class="ocultar-movil {% if not c.esta_vigente and c.estado != 'facturada' %}tenue{% endif %}">{{ c.valida_hasta|date:"d/m/Y"|default:"—" }}</td>
+          <td>{% badge_cotizacion c %}</td>
+          <td class="num fuerte">{{ c.total|clp }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "panel/_paginacion.html" %}
+  {% else %}
+  <div class="vacio">
+    {% icono "cotizacion" %}
+    {% if q or estado %}<h3>No hay cotizaciones con ese filtro</h3><p><a href="{% url 'panel:cotizaciones' %}">Ver todas</a></p>
+    {% else %}<h3>Aún no hay cotizaciones</h3><p>Arma tu primera cotización con productos de tu catálogo.</p>
+    <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

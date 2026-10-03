@@ -1,0 +1,17 @@
+# Núcleo
+Django>=5.2.8,<5.3  # LTS; 5.2.8+ soporta Python 3.14
+
+# Adaptadores de proveedores (llamadas HTTP a la API de facturación)
+requests>=2.31
+
+# PDF de cotizaciones. xhtml2pdf es 100% Python (funciona en Windows sin
+# instalar nada más). WeasyPrint da mejor resultado pero requiere GTK
+# (cairo, pango); si está disponible se usa automáticamente.
+xhtml2pdf>=0.2.16
+
+# Logo de la empresa (ImageField)
+Pillow>=10.0
+
+# Producción: servidor WSGI y archivos estáticos
+gunicorn>=22.0
+whitenoise>=6.6

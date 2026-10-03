@@ -1,0 +1,46 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Productos{% endblock %}
+{% block encabezado %}Productos y servicios{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Tu catálogo: se agregan a una cotización con un clic.</div>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">{% icono "mas" %} Nuevo producto</a>{% endblock %}
+
+{% block contenido %}
+<form class="herramientas" method="get">
+  <div class="buscador">{% icono "buscar" %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o código…"></div>
+  <label class="check small"><input type="checkbox" name="inactivos" value="1" {% if request.GET.inactivos %}checked{% endif %} onchange="this.form.submit()"> Incluir inactivos</label>
+</form>
+
+<section class="card">
+  {% if pagina.object_list %}
+  <div class="tabla-wrap">
+    <table class="tabla tabla--click">
+      <thead><tr><th>Producto</th><th class="ocultar-movil">Código</th><th>IVA</th><th class="num">Precio neto</th><th class="num ocultar-movil">Con IVA</th></tr></thead>
+      <tbody>
+      {% for p in pagina %}
+        <tr data-href="{% url 'panel:producto_editar' p.pk %}">
+          <td class="principal-celda">
+            <a href="{% url 'panel:producto_editar' p.pk %}">{{ p.nombre }}</a>
+            {% if p.descripcion %}<span class="sub">{{ p.descripcion|truncatechars:70 }}</span>{% endif %}
+            {% if not p.activo %}<span class="badge badge--gris">Inactivo</span>{% endif %}
+          </td>
+          <td class="ocultar-movil tenue">{{ p.codigo|default:"—" }}</td>
+          <td>{% if p.exento %}<span class="etiqueta">Exento</span>{% else %}<span class="tenue small">Afecto</span>{% endif %}</td>
+          <td class="num fuerte">{{ p.precio_neto|clp }}</td>
+          <td class="num ocultar-movil tenue">{% if p.exento %}{{ p.precio_neto|clp }}{% else %}{% widthratio p.precio_neto 100 119 as con_iva %}{{ con_iva|clp }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "panel/_paginacion.html" %}
+  {% else %}
+  <div class="vacio">
+    {% icono "productos" %}
+    {% if q %}<h3>Sin resultados para «{{ q }}»</h3><p>Prueba con otro nombre o código.</p>
+    {% else %}<h3>Tu catálogo está vacío</h3><p>Agrega los productos y servicios que vendes para cotizar más rápido.</p>{% endif %}
+    <a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">{% icono "mas" %} Nuevo producto</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

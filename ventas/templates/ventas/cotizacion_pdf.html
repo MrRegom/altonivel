@@ -1,0 +1,108 @@
+{% load panel_tags %}<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: letter; margin: 1.6cm 1.6cm 2cm 1.6cm;
+    @frame pie { -pdf-frame-content: pie; bottom: 0.8cm; margin-left: 1.6cm; margin-right: 1.6cm; height: 1cm; } }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 9.5pt; color: #1f2430; }
+  .marca { font-size: 20pt; font-weight: bold; color: #141a2b; letter-spacing: 1px; }
+  .sub { color: #6b7385; font-size: 8.5pt; }
+  .titulo { background-color: #141a2b; color: #ffffff; padding: 10px 12px; }
+  .titulo-num { font-size: 15pt; font-weight: bold; color: #ffffff; }
+  .titulo-lbl { font-size: 8pt; color: #f26522; font-weight: bold; letter-spacing: 1px; }
+  .barra { background-color: #1d7686; height: 4px; }
+  .caja { border: 1px solid #dfe3ea; padding: 8px 10px; }
+  .lbl { color: #6b7385; font-size: 7.5pt; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+  table.items { width: 100%; }
+  table.items th { background-color: #1d7686; color: #ffffff; font-size: 8pt; padding: 6px 8px;
+    text-align: left; text-transform: uppercase; }
+  table.items td { padding: 6px 8px; border-bottom: 1px solid #e6e9ef; vertical-align: top; }
+  .num { text-align: right; }
+  .exento { color: #1d7686; font-size: 7.5pt; font-weight: bold; }
+  table.totales td { padding: 4px 8px; }
+  .total-final td { background-color: #f26522; color: #ffffff; font-size: 12pt; font-weight: bold; padding: 7px 8px; }
+  .nota { background-color: #f4f6f9; padding: 8px 10px; color: #3a4152; }
+  #pie { color: #8a91a2; font-size: 7.5pt; text-align: center; }
+</style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td style="width: 60%; vertical-align: middle;">
+        {% if logo %}<img src="{{ logo }}" style="height: 60px;"><br>{% endif %}
+        <span class="marca">{% if empresa %}{{ empresa.nombre_visible|upper }}{% else %}ALTO NIVEL{% endif %}</span><br>
+        {% if empresa %}
+        <span class="sub">{{ empresa.razon_social }} · RUT {{ empresa.rut|rut }}<br>
+        {{ empresa.giro }}<br>
+        {{ empresa.direccion }}, {{ empresa.comuna }}
+        {% if empresa.telefono %} · {{ empresa.telefono }}{% endif %}
+        {% if empresa.correo %} · {{ empresa.correo }}{% endif %}</span>
+        {% endif %}
+      </td>
+      <td style="width: 40%;" class="titulo">
+        <span class="titulo-lbl">COTIZACIÓN</span><br>
+        <span class="titulo-num">N° {{ c.numero }}</span><br>
+        <span style="color:#c9cfdb; font-size:8.5pt;">Fecha: {{ c.fecha|date:"d/m/Y" }}
+        {% if c.valida_hasta %}<br>Válida hasta: {{ c.valida_hasta|date:"d/m/Y" }}{% endif %}</span>
+      </td>
+    </tr>
+  </table>
+  <div class="barra"></div>
+
+  <table style="margin-top: 14px;">
+    <tr>
+      <td class="caja">
+        <span class="lbl">Cliente</span><br>
+        <strong style="font-size: 11pt;">{{ c.cliente.razon_social }}</strong><br>
+        RUT {{ c.cliente.rut_formateado }}{% if c.cliente.giro %} · {{ c.cliente.giro }}{% endif %}<br>
+        {{ c.cliente.direccion }}{% if c.cliente.comuna %}, {{ c.cliente.comuna }}{% endif %}
+        {% if c.cliente.contacto %}<br>Atención: {{ c.cliente.contacto }}{% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="items" style="margin-top: 16px;" repeat="1">
+    <thead>
+      <tr>
+        <th style="width: 52%;">Descripción</th>
+        <th class="num" style="width: 12%;">Cant.</th>
+        <th class="num" style="width: 18%;">Precio unit.</th>
+        <th class="num" style="width: 18%;">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in c.items.all %}
+      <tr>
+        <td>{{ item.descripcion }}{% if item.exento %} <span class="exento">EXENTO</span>{% endif %}</td>
+        <td class="num">{{ item.cantidad|cantidad }}</td>
+        <td class="num">{{ item.precio_unitario|clp }}</td>
+        <td class="num">{{ item.subtotal|clp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table style="margin-top: 14px;">
+    <tr>
+      <td style="width: 58%; vertical-align: top; padding-right: 14px;">
+        {% if c.observaciones %}
+        <div class="nota"><span class="lbl">Observaciones</span><br>{{ c.observaciones|linebreaksbr }}</div>
+        {% endif %}
+      </td>
+      <td style="width: 42%; vertical-align: top;">
+        <table class="totales">
+          <tr><td>Neto</td><td class="num">{{ c.monto_neto|clp }}</td></tr>
+          {% if c.monto_exento %}<tr><td>Exento</td><td class="num">{{ c.monto_exento|clp }}</td></tr>{% endif %}
+          <tr><td>IVA (19%)</td><td class="num">{{ c.iva|clp }}</td></tr>
+          <tr class="total-final"><td>TOTAL</td><td class="num">{{ c.total|clp }}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div id="pie">
+    {% if empresa %}{{ empresa.nombre_visible }}{% if empresa.sitio_web %} · {{ empresa.sitio_web }}{% endif %} · {% endif %}Cotización N° {{ c.numero }} · Página <pdf:pagenumber> de <pdf:pagecount>
+  </div>
+</body>
+</html>

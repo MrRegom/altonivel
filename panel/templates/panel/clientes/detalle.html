@@ -1,0 +1,64 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{{ cliente.razon_social }}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:clientes' %}">Clientes</a></div>{% endblock %}
+{% block encabezado %}{{ cliente.razon_social }}{% endblock %}
+{% block subtitulo %}<div class="subtitulo">RUT {{ cliente.rut|rut }}{% if not cliente.activo %} · Inactivo{% endif %}</div>{% endblock %}
+{% block acciones %}
+  <a class="btn btn--claro" href="{% url 'panel:cliente_editar' cliente.pk %}">{% icono "editar" %} Editar</a>
+  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}?cliente={{ cliente.pk }}">{% icono "mas" %} Cotizar</a>
+{% endblock %}
+
+{% block contenido %}
+<div class="rejilla rejilla--lateral">
+  <div>
+    <section class="card">
+      <div class="card__cab"><h2>Cotizaciones</h2><span class="tenue small">{{ cotizaciones|length }}</span></div>
+      {% if cotizaciones %}
+      <div class="tabla-wrap"><table class="tabla tabla--click">
+        <thead><tr><th>N°</th><th>Fecha</th><th>Estado</th><th class="num">Total</th></tr></thead>
+        <tbody>{% for c in cotizaciones %}
+          <tr data-href="{% url 'panel:cotizacion_detalle' c.pk %}">
+            <td><a class="folio" href="{% url 'panel:cotizacion_detalle' c.pk %}">{{ c.numero }}</a></td>
+            <td>{{ c.fecha|date:"d/m/Y" }}</td><td>{% badge_cotizacion c %}</td><td class="num fuerte">{{ c.total|clp }}</td>
+          </tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<div class="card__cuerpo tenue">Sin cotizaciones todavía.</div>{% endif %}
+    </section>
+
+    <section class="card">
+      <div class="card__cab"><h2>Documentos emitidos</h2><span class="tenue small">{{ documentos|length }}</span></div>
+      {% if documentos %}
+      <div class="tabla-wrap"><table class="tabla tabla--click">
+        <thead><tr><th>Documento</th><th>Fecha</th><th>Estado SII</th><th class="num">Total</th></tr></thead>
+        <tbody>{% for d in documentos %}
+          <tr data-href="{% url 'panel:documento_detalle' d.pk %}">
+            <td class="principal-celda"><a href="{% url 'panel:documento_detalle' d.pk %}"><span class="folio">{% if d.folio %}N°{{ d.folio }}{% else %}Sin folio{% endif %}</span></a><span class="sub">{{ d.get_tipo_dte_display }}</span></td>
+            <td>{{ d.fecha_emision|date:"d/m/Y" }}</td><td>{% badge_sii d %}</td><td class="num fuerte">{{ d.total|clp }}</td>
+          </tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<div class="card__cuerpo tenue">Aún no se le ha facturado.</div>{% endif %}
+    </section>
+  </div>
+
+  <aside>
+    <section class="card">
+      <div class="card__cab"><h2>Datos de facturación</h2></div>
+      <div class="card__cuerpo">
+        <dl class="datos">
+          <dt>Giro</dt><dd>{{ cliente.giro|default:"—" }}</dd>
+          <dt>Dirección</dt><dd>{{ cliente.direccion|default:"—" }}</dd>
+          <dt>Comuna</dt><dd>{{ cliente.comuna|default:"—" }}{% if cliente.ciudad %}, {{ cliente.ciudad }}{% endif %}</dd>
+          <dt>Correo</dt><dd>{% if cliente.correo %}<a href="mailto:{{ cliente.correo }}">{{ cliente.correo }}</a>{% else %}—{% endif %}</dd>
+          <dt>Teléfono</dt><dd>{{ cliente.telefono|default:"—" }}</dd>
+          <dt>Contacto</dt><dd>{{ cliente.contacto|default:"—" }}</dd>
+        </dl>
+        {% if not cliente.giro or not cliente.direccion or not cliente.comuna %}
+        <div class="aviso" style="margin-top:16px">Faltan datos obligatorios para facturar (giro, dirección o comuna).</div>
+        {% endif %}
+      </div>
+      <div class="card__pie"><span class="tenue small">Total facturado</span><div class="kpi__valor" style="font-size:22px;margin:0">{{ facturado|clp }}</div></div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

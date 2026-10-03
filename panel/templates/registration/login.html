@@ -1,0 +1,43 @@
+{% load static panel_tags %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar · {{ marca_nombre }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'panel/app.css' %}">
+</head>
+<body>
+  <div class="login">
+    <div class="login__caja">
+      <div class="login__marca">
+        {% include "panel/_escudo.html" %}
+        <span><span class="marca__nombre" style="font-size:24px">{{ marca_nombre }}</span><span class="marca__sub">Cotizaciones y facturación</span></span>
+      </div>
+      <div class="login__card">
+        <h1>Bienvenido</h1>
+        <p>Ingresa con tu usuario para continuar.</p>
+        {% if form.non_field_errors %}
+          <div class="alerta alerta--error" style="margin-bottom:16px">{% icono "alerta" %}<span>Usuario o contraseña incorrectos.</span></div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <div class="campo">
+            <label for="id_username">Usuario</label>
+            <input type="text" name="username" id="id_username" autocomplete="username" autofocus required value="{{ form.username.value|default:'' }}">
+          </div>
+          <div class="campo">
+            <label for="id_password">Contraseña</label>
+            <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn--primario btn--bloque" style="padding:12px">Ingresar {% icono "flecha" %}</button>
+        </form>
+      </div>
+      <div class="login__pie">Facturación electrónica integrada con el SII</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% load panel_tags %}
+<tr class="item{% if f.DELETE.value %} oculto{% endif %}">
+  <td class="col-prod" data-lbl="Producto">
+    {% for h in f.hidden_fields %}{{ h }}{% endfor %}
+    {{ f.producto }}
+    {{ f.producto.errors }}
+  </td>
+  <td class="col-desc" data-lbl="Descripción">{{ f.descripcion }}{{ f.descripcion.errors }}</td>
+  <td class="col-cant" data-lbl="Cantidad">{{ f.cantidad }}{{ f.cantidad.errors }}</td>
+  <td class="col-precio" data-lbl="Precio neto">{{ f.precio_unitario }}{{ f.precio_unitario.errors }}</td>
+  <td class="col-exento" data-lbl="Exento">{{ f.exento }}</td>
+  <td class="col-sub" data-lbl="Subtotal"><span class="subtotal">$0</span></td>
+  <td class="col-quitar">
+    <span class="oculto">{{ f.DELETE }}</span>
+    <button type="button" class="btn btn--fantasma btn-icono quitar" title="Quitar ítem" aria-label="Quitar ítem">{% icono "quitar" %}</button>
+  </td>
+</tr>

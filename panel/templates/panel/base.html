@@ -1,0 +1,89 @@
+{% load static panel_tags %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Panel{% endblock %} · {{ marca_nombre }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'panel/app.css' %}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 42'%3E%3Cpath d='M19 1 2 7v12c0 10.2 7.1 18.4 17 22 9.9-3.6 17-11.8 17-22V7z' fill='%23f9520b'/%3E%3Cpath d='M11 25.5 19 12l8 13.5z' fill='%23161725'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="marca" href="{% url 'panel:inicio' %}">
+      {% if marca_logo %}
+        <img class="marca__logo" src="{{ marca_logo }}" alt="{{ marca_nombre }}">
+      {% else %}
+        {% include "panel/_escudo.html" %}
+        <span><span class="marca__nombre">{{ marca_nombre }}</span><span class="marca__sub">Facturación</span></span>
+      {% endif %}
+    </a>
+
+    <nav class="nav">
+      <a class="nav__cta btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+      <a class="{% activo '/' %}" href="{% url 'panel:inicio' %}">{% icono "inicio" %} Inicio</a>
+      <a class="{% activo '/cotizaciones/' %}" href="{% url 'panel:cotizaciones' %}">{% icono "cotizacion" %} Cotizaciones</a>
+      <a class="{% activo '/facturas/' %}" href="{% url 'panel:documentos' %}">{% icono "factura" %} Facturas</a>
+      <a class="{% activo '/clientes/' %}" href="{% url 'panel:clientes' %}">{% icono "clientes" %} Clientes</a>
+      <a class="{% activo '/productos/' %}" href="{% url 'panel:productos' %}">{% icono "productos" %} Productos</a>
+      <div class="nav__titulo">Configuración</div>
+      <a class="{% activo '/configuracion/' %}" href="{% url 'panel:empresa' %}">{% icono "empresa" %} Mi empresa</a>
+      {% if user.is_superuser %}
+      <a href="{% url 'admin:index' %}">{% icono "admin" %} Administración</a>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar__pie">
+      <span class="avatar">{{ user.get_username|first|upper }}</span>
+      <span class="usuario">{{ user.get_full_name|default:user.get_username }}</span>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" title="Cerrar sesión" aria-label="Cerrar sesión">{% icono "salir" %}</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <div class="barra-movil">
+      <button type="button" id="abrir-menu" aria-label="Abrir menú">{% icono "menu" %}</button>
+      <span class="marca__nombre">{{ marca_nombre }}</span>
+      <a class="btn btn--primario btn--sm" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %}</a>
+    </div>
+
+    {% if modo_prueba %}
+    <div class="modo-prueba">{% icono "alerta" %} MODO PRUEBA · Las facturas que se emiten aquí no tienen validez tributaria.</div>
+    {% endif %}
+    <header class="encabezado">
+      <div class="encabezado__fila">
+        <div>
+          {% block miga %}{% endblock %}
+          <h1>{% block encabezado %}{% endblock %}</h1>
+          {% block subtitulo %}{% endblock %}
+        </div>
+        <div class="acciones">{% block acciones %}{% endblock %}</div>
+      </div>
+    </header>
+
+    <main class="contenido">
+      {% if messages %}
+      <div class="mensajes" role="status">
+        {% for m in messages %}
+        <div class="alerta alerta--{{ m.tags|default:'info' }}">
+          {% if m.tags == "success" %}{% icono "check" %}{% else %}{% icono "alerta" %}{% endif %}
+          <span>{{ m }}</span>
+          <button class="cerrar" type="button" aria-label="Cerrar" onclick="this.parentElement.remove()">{% icono "x" %}</button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% block contenido %}{% endblock %}
+    </main>
+  </div>
+</div>
+<script src="{% static 'panel/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

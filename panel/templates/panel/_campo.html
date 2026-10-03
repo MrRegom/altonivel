@@ -1,0 +1,10 @@
+<div class="campo{% if f.errors %} campo--error{% endif %}{% if ancho %} ancho{% endif %}">
+  {% if f.field.widget.input_type == "checkbox" %}
+    <label class="check">{{ f }} {{ f.label }}</label>
+  {% else %}
+    <label for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="req">*</span>{% endif %}</label>
+    {{ f }}
+  {% endif %}
+  {% if f.help_text %}<div class="ayuda">{{ f.help_text }}</div>{% endif %}
+  {{ f.errors }}
+</div>

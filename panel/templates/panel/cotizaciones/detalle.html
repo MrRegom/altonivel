@@ -1,0 +1,162 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Cotización N°{{ c.numero }}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:cotizaciones' %}">Cotizaciones</a></div>{% endblock %}
+{% block encabezado %}Cotización N°{{ c.numero }}{% endblock %}
+{% block subtitulo %}<div class="subtitulo">{{ c.cliente.razon_social }} · {{ c.fecha|date:"d \d\e F Y" }}</div>{% endblock %}
+{% block acciones %}
+  <a class="btn btn--claro" href="{% url 'panel:cotizacion_pdf' c.pk %}" target="_blank">{% icono "ver" %} Ver PDF</a>
+  {% if editable %}<a class="btn btn--claro" href="{% url 'panel:cotizacion_editar' c.pk %}">{% icono "editar" %} Editar</a>{% endif %}
+{% endblock %}
+
+{% block contenido %}
+{% with e=c.estado %}
+<div class="flujo">
+  <div class="paso hecho"><span class="paso__num">{% icono "check" %}</span><span>Creada<small>{{ c.creado_en|date:"d/m H:i" }}</small></span></div>
+  <div class="paso {% if c.enviada_en or e == 'aceptada' or e == 'facturada' %}hecho{% elif e == 'borrador' %}actual{% endif %}">
+    <span class="paso__num">{% if c.enviada_en or e == 'aceptada' or e == 'facturada' %}{% icono "check" %}{% else %}2{% endif %}</span>
+    <span>Enviada<small>{% if c.enviada_en %}{{ c.enviada_en|date:"d/m H:i" }}{% else %}Pendiente{% endif %}</small></span>
+  </div>
+  <div class="paso {% if e == 'aceptada' or e == 'facturada' %}hecho{% elif e == 'enviada' %}actual{% endif %}">
+    <span class="paso__num">{% if e == 'aceptada' or e == 'facturada' %}{% icono "check" %}{% elif e == 'rechazada' %}{% icono "x" %}{% else %}3{% endif %}</span>
+    <span>{% if e == 'rechazada' %}Rechazada{% else %}Aceptada{% endif %}<small>{% if e == 'rechazada' %}Por el cliente{% elif e == 'aceptada' or e == 'facturada' %}Por el cliente{% else %}Esperando respuesta{% endif %}</small></span>
+  </div>
+  <div class="paso {% if e == 'facturada' %}hecho{% elif e == 'aceptada' %}actual{% endif %}">
+    <span class="paso__num">{% if e == 'facturada' %}{% icono "check" %}{% else %}4{% endif %}</span>
+    <span>Facturada<small>{% if e == 'facturada' %}{% with d=documentos.first %}{% if d.folio %}Folio {{ d.folio }}{% endif %}{% endwith %}{% else %}Pendiente{% endif %}</small></span>
+  </div>
+</div>
+{% endwith %}
+
+<div class="rejilla rejilla--lateral">
+  <div>
+    <section class="card">
+      <div class="card__cab"><h2>Detalle</h2>{% badge_cotizacion c %}</div>
+      <div class="tabla-wrap">
+        <table class="tabla">
+          <thead><tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio neto</th><th class="num">Subtotal</th></tr></thead>
+          <tbody>
+          {% for i in c.items.all %}
+            <tr>
+              <td class="fuerte">{{ i.descripcion }} {% if i.exento %}<span class="etiqueta">Exento</span>{% endif %}</td>
+              <td class="num">{{ i.cantidad|cantidad }}</td>
+              <td class="num">{{ i.precio_unitario|clp }}</td>
+              <td class="num fuerte">{{ i.subtotal|clp }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card__pie" style="display:flex;justify-content:flex-end">
+        <div class="totales" style="max-width:320px">
+          <div class="fila"><span>Neto</span><span>{{ c.monto_neto|clp }}</span></div>
+          {% if c.monto_exento %}<div class="fila"><span>Exento</span><span>{{ c.monto_exento|clp }}</span></div>{% endif %}
+          <div class="fila"><span>IVA (19%)</span><span>{{ c.iva|clp }}</span></div>
+          <div class="fila fila--total"><span>TOTAL</span><span>{{ c.total|clp }}</span></div>
+        </div>
+      </div>
+    </section>
+
+    {% if c.observaciones %}
+    <section class="card"><div class="card__cab"><h2>Observaciones</h2></div><div class="card__cuerpo">{{ c.observaciones|linebreaksbr }}</div></section>
+    {% endif %}
+
+    {% if documentos %}
+    <section class="card">
+      <div class="card__cab"><h2>Documentos tributarios</h2></div>
+      <div class="tabla-wrap"><table class="tabla tabla--click">
+        <thead><tr><th>Documento</th><th>Fecha</th><th>Estado SII</th><th class="num">Total</th></tr></thead>
+        <tbody>{% for d in documentos %}
+          <tr data-href="{% url 'panel:documento_detalle' d.pk %}">
+            <td class="principal-celda"><a href="{% url 'panel:documento_detalle' d.pk %}">{{ d.get_tipo_dte_display }}</a><span class="sub">{% if d.folio %}Folio {{ d.folio }}{% else %}Sin folio{% endif %}</span></td>
+            <td>{{ d.fecha_emision|date:"d/m/Y" }}</td><td>{% badge_sii d %}</td><td class="num fuerte">{{ d.total|clp }}</td>
+          </tr>{% endfor %}</tbody>
+      </table></div>
+    </section>
+    {% endif %}
+  </div>
+
+  <aside>
+    <section class="card">
+      <div class="card__cab"><h2>Acciones</h2></div>
+      <div class="card__cuerpo lista-acciones">
+        {% if puede_facturar %}
+          <button type="button" class="btn btn--primario btn--bloque" data-abrir="dlg-emitir">{% icono "rayo" %} Emitir factura</button>
+          {% if c.estado != 'aceptada' %}<div class="tenue small" style="text-align:center">También puedes marcarla como aceptada primero.</div>{% endif %}
+          <div class="separador"></div>
+        {% endif %}
+
+        <form method="post" action="{% url 'panel:cotizacion_enviar' c.pk %}" data-una-vez>
+          {% csrf_token %}
+          <button class="btn btn--turquesa btn--bloque" type="submit" data-cargando="Enviando…" {% if not c.cliente.correo %}disabled title="El cliente no tiene correo"{% endif %}>
+            {% icono "enviar" %} {% if c.enviada_en %}Reenviar{% else %}Enviar{% endif %} por correo
+          </button>
+        </form>
+        {% if c.cliente.correo %}<div class="tenue small" style="text-align:center;margin-top:-2px">a {{ c.cliente.correo }}</div>
+        {% else %}<div class="aviso">El cliente no tiene correo. <a href="{% url 'panel:cliente_editar' c.cliente.pk %}">Agregar</a></div>{% endif %}
+        <a class="btn btn--secundario btn--bloque" href="{% url 'panel:cotizacion_pdf' c.pk %}?descargar=1">{% icono "descargar" %} Descargar PDF</a>
+
+        {% if editable %}
+        <div class="separador"></div>
+        {% if c.estado != 'aceptada' %}
+        <form method="post" action="{% url 'panel:cotizacion_estado' c.pk %}">{% csrf_token %}<input type="hidden" name="estado" value="aceptada">
+          <button class="btn btn--secundario btn--bloque" type="submit">{% icono "check" %} Cliente aceptó</button></form>
+        {% endif %}
+        {% if c.estado != 'rechazada' %}
+        <form method="post" action="{% url 'panel:cotizacion_estado' c.pk %}">{% csrf_token %}<input type="hidden" name="estado" value="rechazada">
+          <button class="btn btn--peligro btn--bloque" type="submit">{% icono "x" %} Cliente rechazó</button></form>
+        {% else %}
+        <form method="post" action="{% url 'panel:cotizacion_estado' c.pk %}">{% csrf_token %}<input type="hidden" name="estado" value="borrador">
+          <button class="btn btn--fantasma btn--bloque" type="submit">Reabrir como borrador</button></form>
+        {% endif %}
+        {% endif %}
+
+        <div class="separador"></div>
+        <form method="post" action="{% url 'panel:cotizacion_duplicar' c.pk %}">{% csrf_token %}
+          <button class="btn btn--fantasma btn--bloque" type="submit">{% icono "copiar" %} Duplicar cotización</button></form>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__cab"><h2>Cliente</h2><a class="small" href="{% url 'panel:cliente_detalle' c.cliente.pk %}">Ver ficha</a></div>
+      <div class="card__cuerpo">
+        <dl class="datos" style="grid-template-columns:90px 1fr">
+          <dt>RUT</dt><dd>{{ c.cliente.rut|rut }}</dd>
+          <dt>Giro</dt><dd>{{ c.cliente.giro|default:"—" }}</dd>
+          <dt>Dirección</dt><dd>{{ c.cliente.direccion|default:"—" }}{% if c.cliente.comuna %}, {{ c.cliente.comuna }}{% endif %}</dd>
+          <dt>Válida</dt><dd>{% if c.valida_hasta %}hasta {{ c.valida_hasta|date:"d/m/Y" }}{% if not c.esta_vigente %} <span class="badge badge--gris">Vencida</span>{% endif %}{% else %}—{% endif %}</dd>
+        </dl>
+      </div>
+    </section>
+  </aside>
+</div>
+
+{% if puede_facturar %}
+<dialog class="modal" id="dlg-emitir">
+  <form method="post" action="{% url 'panel:cotizacion_emitir' c.pk %}" data-una-vez>
+    {% csrf_token %}
+    <div class="modal__cab"><h2>Emitir documento al SII</h2></div>
+    <div class="modal__cuerpo">
+      <p style="margin:0">Se emitirá un documento tributario <strong>real</strong> a nombre de <strong>{{ c.cliente.razon_social }}</strong>. Una vez emitido no se puede modificar; solo anular con nota de crédito.</p>
+      <dl class="resumen-modal">
+        <dt>Neto</dt><dd>{{ c.monto_neto|clp }}</dd>
+        {% if c.monto_exento %}<dt>Exento</dt><dd>{{ c.monto_exento|clp }}</dd>{% endif %}
+        <dt>IVA</dt><dd>{{ c.iva|clp }}</dd>
+        <dt>Total</dt><dd style="color:var(--naranjo);font-size:16px">{{ c.total|clp }}</dd>
+      </dl>
+      <div class="campo">
+        <label for="tipo_dte">Tipo de documento</label>
+        <select name="tipo_dte" id="tipo_dte">
+          <option value="33" {% if not solo_exentos %}selected{% endif %}>Factura electrónica (33)</option>
+          <option value="34" {% if solo_exentos %}selected{% endif %}>Factura exenta electrónica (34)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__pie">
+      <button type="button" class="btn btn--fantasma" data-cerrar>Cancelar</button>
+      <button type="submit" class="btn btn--primario" data-cargando="Emitiendo…">{% icono "rayo" %} Emitir ahora</button>
+    </div>
+  </form>
+</dialog>
+{% endif %}
+{% endblock %}

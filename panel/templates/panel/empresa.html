@@ -1,0 +1,56 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Mi empresa{% endblock %}
+{% block encabezado %}Mi empresa{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Datos con los que se emiten las facturas y las cotizaciones.</div>{% endblock %}
+
+{% block contenido %}
+<div class="rejilla rejilla--lateral">
+  <form method="post" enctype="multipart/form-data" class="card" novalidate>
+    {% csrf_token %}
+    <div class="card__cuerpo">
+      {% if form.non_field_errors %}<div class="aviso aviso--error" style="margin-bottom:16px">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+      <div class="form-grid">
+        <div class="seccion-form">Marca</div>
+        {% include "panel/_campo.html" with f=form.nombre_fantasia %}
+        {% include "panel/_campo.html" with f=form.sitio_web %}
+        {% include "panel/_campo.html" with f=form.logo ancho=1 %}
+
+        <div class="seccion-form">Datos tributarios (idénticos al SII)</div>
+        {% include "panel/_campo.html" with f=form.rut %}
+        {% include "panel/_campo.html" with f=form.razon_social %}
+        {% include "panel/_campo.html" with f=form.giro ancho=1 %}
+        {% include "panel/_campo.html" with f=form.actividades ancho=1 %}
+
+        <div class="seccion-form">Dirección de emisión</div>
+        {% include "panel/_campo.html" with f=form.direccion ancho=1 %}
+        {% include "panel/_campo.html" with f=form.comuna %}
+        {% include "panel/_campo.html" with f=form.ciudad %}
+        {% include "panel/_campo.html" with f=form.codigo_sucursal %}
+
+        <div class="seccion-form">Contacto</div>
+        {% include "panel/_campo.html" with f=form.correo %}
+        {% include "panel/_campo.html" with f=form.telefono %}
+      </div>
+    </div>
+    <div class="card__pie form-acciones">
+      <button class="btn btn--primario" type="submit">{% icono "check" %} Guardar</button>
+    </div>
+  </form>
+
+  <aside>
+    <section class="card">
+      <div class="card__cab"><h2>¿Dónde encuentro estos datos?</h2></div>
+      <div class="card__cuerpo small" style="color:var(--texto-2)">
+        <p style="margin-top:0">En <strong>sii.cl → Mi SII → Datos personales y tributarios</strong>:</p>
+        <ul style="padding-left:18px;margin:0 0 12px">
+          <li><strong>Razón social y RUT:</strong> arriba, tal cual aparecen.</li>
+          <li><strong>Giro y código de actividad:</strong> sección «Actividades económicas» (código de 6 dígitos).</li>
+          <li><strong>Dirección y código de sucursal:</strong> sección «Direcciones», la dirección desde donde se factura.</li>
+        </ul>
+        <div class="aviso aviso--info">Si la razón social no coincide exactamente con el SII, el proveedor mostrará una advertencia al emitir.</div>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

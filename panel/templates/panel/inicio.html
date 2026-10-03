@@ -1,0 +1,112 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Inicio{% endblock %}
+{% block encabezado %}Hola, {{ user.first_name|default:user.get_username }}{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Resumen de {{ mes|date:"F Y" }}</div>{% endblock %}
+{% block acciones %}
+  <a class="btn btn--claro" href="{% url 'panel:cliente_nuevo' %}">{% icono "clientes" %} Nuevo cliente</a>
+  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+{% endblock %}
+
+{% block contenido %}
+{% if not empresa_configurada %}
+<div class="alerta alerta--warning" style="margin-bottom:20px">
+  {% icono "alerta" %}
+  <span>Antes de facturar, completa los datos de tu empresa tal como aparecen en el SII.
+    <a href="{% url 'panel:empresa' %}">Configurar ahora →</a></span>
+</div>
+{% endif %}
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi__lbl">Facturado este mes</div>
+    <div class="kpi__valor">{{ kpi.facturado_mes|clp }}</div>
+    <div class="kpi__detalle">{{ kpi.facturas_mes }} documento{{ kpi.facturas_mes|pluralize }}</div>
+  </div>
+  <div class="kpi kpi--naranjo">
+    <div class="kpi__lbl">Aceptadas por facturar</div>
+    <div class="kpi__valor">{{ kpi.por_facturar_monto|clp }}</div>
+    <div class="kpi__detalle">{{ kpi.por_facturar }} cotización{{ kpi.por_facturar|pluralize:"es" }}</div>
+  </div>
+  <div class="kpi kpi--celeste">
+    <div class="kpi__lbl">Cotizado este mes</div>
+    <div class="kpi__valor">{{ kpi.cotizado_mes|clp }}</div>
+    <div class="kpi__detalle">{{ kpi.cotizaciones_mes }} cotización{{ kpi.cotizaciones_mes|pluralize:"es" }}</div>
+  </div>
+  <div class="kpi kpi--marino">
+    <div class="kpi__lbl">Esperando al SII</div>
+    <div class="kpi__valor">{{ kpi.esperando_sii }}</div>
+    <div class="kpi__detalle">documento{{ kpi.esperando_sii|pluralize }} enviado{{ kpi.esperando_sii|pluralize }}</div>
+  </div>
+</div>
+
+<div class="rejilla rejilla--lateral">
+  <div>
+    <section class="card">
+      <div class="card__cab">
+        <h2>Últimas cotizaciones</h2>
+        <a class="btn btn--fantasma btn--sm" href="{% url 'panel:cotizaciones' %}">Ver todas {% icono "flecha" %}</a>
+      </div>
+      {% if ultimas_cotizaciones %}
+      <div class="tabla-wrap">
+        <table class="tabla tabla--click">
+          <thead><tr><th>N°</th><th>Cliente</th><th class="ocultar-movil">Fecha</th><th>Estado</th><th class="num">Total</th></tr></thead>
+          <tbody>
+          {% for c in ultimas_cotizaciones %}
+            <tr data-href="{% url 'panel:cotizacion_detalle' c.pk %}">
+              <td><span class="folio">{{ c.numero }}</span></td>
+              <td class="principal-celda"><a href="{% url 'panel:cotizacion_detalle' c.pk %}">{{ c.cliente.razon_social }}</a></td>
+              <td class="ocultar-movil tenue">{{ c.fecha|date:"d M" }}</td>
+              <td>{% badge_cotizacion c %}</td>
+              <td class="num fuerte">{{ c.total|clp }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="vacio">
+        {% icono "cotizacion" %}
+        <h3>Aún no hay cotizaciones</h3>
+        <p>Crea la primera en menos de un minuto.</p>
+        <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+      </div>
+      {% endif %}
+    </section>
+  </div>
+
+  <div>
+    <section class="card">
+      <div class="card__cab"><h2>Listas para facturar</h2></div>
+      {% if por_facturar %}
+      <div class="card__cuerpo" style="padding-top:8px;padding-bottom:8px">
+        {% for c in por_facturar %}
+        <a href="{% url 'panel:cotizacion_detalle' c.pk %}" style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;{% if not forloop.first %}border-top:1px solid var(--borde);{% endif %}color:var(--texto);text-decoration:none">
+          <span><strong>N°{{ c.numero }}</strong> · {{ c.cliente.razon_social|truncatechars:24 }}</span>
+          <span class="tabular fuerte" style="font-weight:800">{{ c.total|clp }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card__cuerpo tenue small">Cuando un cliente acepte una cotización, márcala como <strong>aceptada</strong> y aparecerá aquí para facturarla.</div>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <div class="card__cab"><h2>Facturas por revisar</h2></div>
+      {% if atencion %}
+      <div class="card__cuerpo" style="padding-top:8px;padding-bottom:8px">
+        {% for d in atencion %}
+        <a href="{% url 'panel:documento_detalle' d.pk %}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;{% if not forloop.first %}border-top:1px solid var(--borde);{% endif %}color:var(--texto);text-decoration:none">
+          <span><strong>{% if d.folio %}Folio {{ d.folio }}{% else %}Sin folio{% endif %}</strong><span class="sub small tenue" style="display:block">{{ d.cliente.razon_social|truncatechars:26 }}</span></span>
+          {% badge_sii d %}
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card__cuerpo tenue small">{% icono "check" %} Todo al día: no hay facturas pendientes ni rechazadas.</div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

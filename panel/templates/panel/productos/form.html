@@ -1,0 +1,25 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{% if producto %}Editar producto{% else %}Nuevo producto{% endif %}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:productos' %}">Productos</a></div>{% endblock %}
+{% block encabezado %}{% if producto %}{{ producto.nombre }}{% else %}Nuevo producto{% endif %}{% endblock %}
+
+{% block contenido %}
+<form method="post" class="card" style="max-width:760px" novalidate>
+  {% csrf_token %}
+  <div class="card__cuerpo">
+    <div class="form-grid">
+      {% include "panel/_campo.html" with f=form.nombre ancho=1 %}
+      {% include "panel/_campo.html" with f=form.codigo %}
+      {% include "panel/_campo.html" with f=form.precio_neto %}
+      {% include "panel/_campo.html" with f=form.descripcion ancho=1 %}
+      {% include "panel/_campo.html" with f=form.exento %}
+      {% include "panel/_campo.html" with f=form.activo %}
+    </div>
+  </div>
+  <div class="card__pie form-acciones">
+    <a class="btn btn--fantasma" href="{% url 'panel:productos' %}">Cancelar</a>
+    <button class="btn btn--primario" type="submit">{% icono "check" %} Guardar producto</button>
+  </div>
+</form>
+{% endblock %}

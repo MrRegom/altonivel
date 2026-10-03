@@ -1,0 +1,162 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{% if cotizacion %}Editar cotización N°{{ cotizacion.numero }}{% else %}Nueva cotización{% endif %}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:cotizaciones' %}">Cotizaciones</a>{% if cotizacion %} / <a href="{% url 'panel:cotizacion_detalle' cotizacion.pk %}">N°{{ cotizacion.numero }}</a>{% endif %}</div>{% endblock %}
+{% block encabezado %}{% if cotizacion %}Editar cotización N°{{ cotizacion.numero }}{% else %}Nueva cotización{% endif %}{% endblock %}
+
+{% block contenido %}
+<form method="post" id="form-cotizacion" novalidate>
+  {% csrf_token %}
+  {% if form.errors or formset.non_form_errors %}
+  <div class="alerta alerta--error" style="margin-bottom:20px">{% icono "alerta" %}
+    <span>Revisa los campos marcados.{% for e in formset.non_form_errors %} {{ e }}{% endfor %}</span>
+  </div>
+  {% endif %}
+
+  <div class="rejilla rejilla--lateral rejilla--form">
+    <div>
+      <section class="card">
+        <div class="card__cab"><h2>Cliente y vigencia</h2></div>
+        <div class="card__cuerpo">
+          <div class="form-grid">
+            <div class="campo ancho{% if form.cliente.errors %} campo--error{% endif %}">
+              <label for="{{ form.cliente.id_for_label }}">Cliente <span class="req">*</span></label>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1">{{ form.cliente }}</div>
+                <a class="btn btn--secundario" href="{% url 'panel:cliente_nuevo' %}?next=cotizacion" title="Registrar un cliente nuevo">{% icono "mas" %} Nuevo</a>
+              </div>
+              {{ form.cliente.errors }}
+            </div>
+            {% include "panel/_campo.html" with f=form.fecha %}
+            {% include "panel/_campo.html" with f=form.valida_hasta %}
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__cab"><h2>Ítems</h2><span class="tenue small">Precios netos, sin IVA</span></div>
+        <div class="card__cuerpo">
+          {{ formset.management_form }}
+          <table class="items">
+            <thead>
+              <tr>
+                <th class="col-prod">Producto</th><th>Descripción</th><th class="col-cant">Cant.</th>
+                <th class="col-precio">Precio neto</th><th class="col-exento">Exento</th><th class="col-sub">Subtotal</th><th class="col-quitar"></th>
+              </tr>
+            </thead>
+            <tbody id="items-cuerpo">
+              {% for f in formset %}{% include "panel/cotizaciones/_fila_item.html" %}{% endfor %}
+            </tbody>
+          </table>
+          <template id="item-vacio">{% with f=formset.empty_form %}{% include "panel/cotizaciones/_fila_item.html" %}{% endwith %}</template>
+          <button type="button" class="btn btn--secundario agregar-item" id="agregar-item">{% icono "mas" %} Agregar ítem</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__cab"><h2>Observaciones</h2></div>
+        <div class="card__cuerpo">{{ form.observaciones }}<div class="ayuda tenue small" style="margin-top:6px">Aparecen en el PDF de la cotización.</div></div>
+      </section>
+    </div>
+
+    <aside style="position:sticky;top:20px">
+      <section class="card">
+        <div class="card__cab"><h2>Resumen</h2></div>
+        <div class="card__cuerpo">
+          <div class="totales">
+            <div class="fila"><span>Neto</span><span id="t-neto">$0</span></div>
+            <div class="fila" id="fila-exento"><span>Exento</span><span id="t-exento">$0</span></div>
+            <div class="fila"><span>IVA (19%)</span><span id="t-iva">$0</span></div>
+            <div class="fila fila--total"><span>TOTAL</span><span id="t-total">$0</span></div>
+          </div>
+        </div>
+        <div class="card__pie" style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn--primario btn--bloque" type="submit">{% icono "check" %} Guardar cotización</button>
+          <a class="btn btn--fantasma btn--bloque" href="{% if cotizacion %}{% url 'panel:cotizacion_detalle' cotizacion.pk %}{% else %}{% url 'panel:cotizaciones' %}{% endif %}">Cancelar</a>
+        </div>
+      </section>
+    </aside>
+  </div>
+</form>
+{{ productos|json_script:"productos-data" }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  "use strict";
+  var productos = JSON.parse(document.getElementById("productos-data").textContent);
+  var cuerpo = document.getElementById("items-cuerpo");
+  var total = document.querySelector("#id_items-TOTAL_FORMS");
+  var plantilla = document.getElementById("item-vacio");
+  var IVA = 0.19;
+
+  function clp(n) { return (n < 0 ? "-$" : "$") + Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+  // Igual que el SII: redondeo al entero, mitades hacia arriba.
+  function redondear(x) { return Math.round(Number(x.toFixed(6))); }
+  function campo(fila, nombre) { return fila.querySelector("[name$='-" + nombre + "']"); }
+
+  function recalcular() {
+    var neto = 0, exento = 0;
+    cuerpo.querySelectorAll("tr.item").forEach(function (fila) {
+      if (fila.classList.contains("oculto")) return;
+      var cant = parseFloat(campo(fila, "cantidad").value) || 0;
+      var precio = parseFloat(campo(fila, "precio_unitario").value) || 0;
+      var sub = redondear(cant * precio);
+      fila.querySelector(".subtotal").textContent = clp(sub);
+      if (campo(fila, "exento").checked) exento += sub; else neto += sub;
+    });
+    var iva = redondear(neto * IVA);
+    document.getElementById("t-neto").textContent = clp(neto);
+    document.getElementById("t-exento").textContent = clp(exento);
+    document.getElementById("fila-exento").classList.toggle("oculto", exento === 0);
+    document.getElementById("t-iva").textContent = clp(iva);
+    document.getElementById("t-total").textContent = clp(neto + iva + exento);
+  }
+
+  function prepararFila(fila) {
+    var sel = campo(fila, "producto");
+    sel.addEventListener("change", function () {
+      var p = productos[sel.value];
+      if (!p) return;
+      campo(fila, "descripcion").value = p.nombre;
+      campo(fila, "precio_unitario").value = p.precio;
+      campo(fila, "exento").checked = p.exento;
+      var cant = campo(fila, "cantidad");
+      if (!cant.value) cant.value = 1;
+      recalcular();
+      cant.focus(); cant.select();
+    });
+    fila.querySelector(".quitar").addEventListener("click", function () {
+      var visibles = cuerpo.querySelectorAll("tr.item:not(.oculto)").length;
+      if (visibles <= 1) { return; }
+      var borrar = campo(fila, "DELETE");
+      if (borrar) borrar.checked = true;
+      fila.classList.add("oculto");
+      recalcular();
+    });
+  }
+
+  function agregar() {
+    var i = parseInt(total.value, 10);
+    var html = plantilla.innerHTML.replace(/__prefix__/g, i);
+    var tmp = document.createElement("tbody");
+    tmp.innerHTML = html.trim();
+    var fila = tmp.querySelector("tr");
+    campo(fila, "cantidad").value = 1;
+    cuerpo.appendChild(fila);
+    total.value = i + 1;
+    prepararFila(fila);
+    recalcular();
+    campo(fila, "producto").focus();
+  }
+
+  cuerpo.querySelectorAll("tr.item").forEach(prepararFila);
+  cuerpo.addEventListener("input", recalcular);
+  cuerpo.addEventListener("change", recalcular);
+  document.getElementById("agregar-item").addEventListener("click", agregar);
+  if (!cuerpo.querySelector("tr.item")) agregar();
+  recalcular();
+})();
+</script>
+{% endblock %}

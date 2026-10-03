@@ -1,0 +1,46 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Clientes{% endblock %}
+{% block encabezado %}Clientes{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Se registran una vez y quedan listos para cotizar y facturar.</div>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">{% icono "mas" %} Nuevo cliente</a>{% endblock %}
+
+{% block contenido %}
+<form class="herramientas" method="get">
+  <div class="buscador">{% icono "buscar" %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, RUT o correo…"></div>
+  <label class="check small"><input type="checkbox" name="inactivos" value="1" {% if request.GET.inactivos %}checked{% endif %} onchange="this.form.submit()"> Incluir inactivos</label>
+</form>
+
+<section class="card">
+  {% if pagina.object_list %}
+  <div class="tabla-wrap">
+    <table class="tabla tabla--click">
+      <thead><tr><th>Cliente</th><th>RUT</th><th class="ocultar-movil">Comuna</th><th class="ocultar-movil">Correo</th><th class="num">Cotizaciones</th></tr></thead>
+      <tbody>
+      {% for c in pagina %}
+        <tr data-href="{% url 'panel:cliente_detalle' c.pk %}">
+          <td class="principal-celda">
+            <a href="{% url 'panel:cliente_detalle' c.pk %}">{{ c.razon_social }}</a>
+            {% if c.giro %}<span class="sub">{{ c.giro|truncatechars:50 }}</span>{% endif %}
+            {% if not c.activo %}<span class="badge badge--gris">Inactivo</span>{% endif %}
+          </td>
+          <td class="nowrap tabular">{{ c.rut|rut }}</td>
+          <td class="ocultar-movil">{{ c.comuna|default:"—" }}</td>
+          <td class="ocultar-movil">{{ c.correo|default:"—" }}</td>
+          <td class="num">{{ c.n_cotizaciones }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "panel/_paginacion.html" %}
+  {% else %}
+  <div class="vacio">
+    {% icono "clientes" %}
+    {% if q %}<h3>Sin resultados para «{{ q }}»</h3><p>Prueba con otro nombre o RUT.</p>
+    {% else %}<h3>Todavía no hay clientes</h3><p>Registra a tu primer cliente con su RUT y datos de facturación.</p>{% endif %}
+    <a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">{% icono "mas" %} Nuevo cliente</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

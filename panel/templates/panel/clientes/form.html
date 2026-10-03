@@ -1,0 +1,34 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{% if cliente %}Editar cliente{% else %}Nuevo cliente{% endif %}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:clientes' %}">Clientes</a>{% if cliente %} / <a href="{% url 'panel:cliente_detalle' cliente.pk %}">{{ cliente.razon_social }}</a>{% endif %}</div>{% endblock %}
+{% block encabezado %}{% if cliente %}Editar cliente{% else %}Nuevo cliente{% endif %}{% endblock %}
+
+{% block contenido %}
+<form method="post" class="card" style="max-width:880px" novalidate>
+  {% csrf_token %}
+  <div class="card__cuerpo">
+    {% if form.non_field_errors %}<div class="aviso aviso--error" style="margin-bottom:16px">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <div class="form-grid">
+      <div class="seccion-form">Identificación</div>
+      {% include "panel/_campo.html" with f=form.rut %}
+      {% include "panel/_campo.html" with f=form.razon_social %}
+      {% include "panel/_campo.html" with f=form.giro ancho=1 %}
+      <div class="seccion-form">Dirección</div>
+      {% include "panel/_campo.html" with f=form.direccion ancho=1 %}
+      {% include "panel/_campo.html" with f=form.comuna %}
+      {% include "panel/_campo.html" with f=form.ciudad %}
+      <div class="seccion-form">Contacto</div>
+      {% include "panel/_campo.html" with f=form.correo %}
+      {% include "panel/_campo.html" with f=form.telefono %}
+      {% include "panel/_campo.html" with f=form.contacto %}
+      {% if cliente %}{% include "panel/_campo.html" with f=form.activo %}{% endif %}
+    </div>
+  </div>
+  <div class="card__pie form-acciones">
+    <a class="btn btn--fantasma" href="{% if cliente %}{% url 'panel:cliente_detalle' cliente.pk %}{% else %}{% url 'panel:clientes' %}{% endif %}">Cancelar</a>
+    {% if not cliente %}<button class="btn btn--secundario" type="submit" formaction="?next=cotizacion">Guardar y cotizar</button>{% endif %}
+    <button class="btn btn--primario" type="submit">{% icono "check" %} Guardar cliente</button>
+  </div>
+</form>
+{% endblock %}

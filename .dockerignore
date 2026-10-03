@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.produccion.example
+db.sqlite3
+db.sqlite3.*
+media/
+staticfiles/
+.claude/
+.git/
+*.pfx
+*.p12
+*.pem
+*.key

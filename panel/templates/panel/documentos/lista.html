@@ -1,0 +1,48 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Facturas{% endblock %}
+{% block encabezado %}Facturas y documentos{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Documentos tributarios emitidos al SII.</div>{% endblock %}
+
+{% block contenido %}
+<form class="herramientas" method="get">
+  {% if estado %}<input type="hidden" name="estado" value="{{ estado }}">{% endif %}
+  <div class="buscador">{% icono "buscar" %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por folio, cliente o RUT…"></div>
+  <div class="chips">
+    <a class="chip {% if not estado %}is-active{% endif %}" href="{% url_con estado='' pagina='' %}">Todos</a>
+    {% for valor, nombre in estados %}
+    <a class="chip {% if estado == valor %}is-active{% endif %}" href="{% url_con estado=valor pagina='' %}">{{ nombre }}</a>
+    {% endfor %}
+  </div>
+</form>
+
+<section class="card">
+  {% if pagina.object_list %}
+  <div class="tabla-wrap">
+    <table class="tabla tabla--click">
+      <thead><tr><th>Folio</th><th>Cliente</th><th class="ocultar-movil">Tipo</th><th class="ocultar-movil">Fecha</th><th>Estado SII</th><th class="num">Total</th></tr></thead>
+      <tbody>
+      {% for d in pagina %}
+        <tr data-href="{% url 'panel:documento_detalle' d.pk %}">
+          <td><a class="folio" href="{% url 'panel:documento_detalle' d.pk %}">{{ d.folio|default:"—" }}</a></td>
+          <td class="principal-celda"><a href="{% url 'panel:documento_detalle' d.pk %}">{{ d.cliente.razon_social }}</a><span class="sub">{{ d.cliente.rut|rut }}</span></td>
+          <td class="ocultar-movil">{{ d.get_tipo_dte_display }}</td>
+          <td class="ocultar-movil">{{ d.fecha_emision|date:"d/m/Y" }}</td>
+          <td>{% badge_sii d %}{% if d.enviado_al_cliente_en %} <span title="Enviada al cliente {{ d.enviado_al_cliente_en|date:'d/m H:i' }}" class="tenue">{% icono "correo" %}</span>{% endif %}</td>
+          <td class="num fuerte">{{ d.total|clp }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "panel/_paginacion.html" %}
+  {% else %}
+  <div class="vacio">
+    {% icono "factura" %}
+    {% if q or estado %}<h3>No hay documentos con ese filtro</h3><p><a href="{% url 'panel:documentos' %}">Ver todos</a></p>
+    {% else %}<h3>Aún no hay facturas emitidas</h3><p>Las facturas se emiten desde una cotización con el botón <strong>Emitir factura</strong>.</p>
+    <a class="btn btn--primario" href="{% url 'panel:cotizaciones' %}">Ir a cotizaciones</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

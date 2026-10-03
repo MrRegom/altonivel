@@ -1,0 +1,88 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{{ d.get_tipo_dte_display }} {{ d.folio|default:"" }}{% endblock %}
+{% block miga %}<div class="miga"><a href="{% url 'panel:documentos' %}">Facturas</a></div>{% endblock %}
+{% block encabezado %}{{ d.get_tipo_dte_display }}{% if d.folio %} N°{{ d.folio }}{% endif %}{% endblock %}
+{% block subtitulo %}<div class="subtitulo">{{ d.cliente.razon_social }} · {{ d.fecha_emision|date:"d \d\e F Y" }}</div>{% endblock %}
+{% block acciones %}
+  {% if d.pdf %}<a class="btn btn--claro" href="{% url 'panel:documento_archivo' d.pk 'pdf' %}" target="_blank">{% icono "ver" %} Ver PDF</a>{% endif %}
+{% endblock %}
+
+{% block contenido %}
+<div class="rejilla rejilla--lateral">
+  <div>
+    <section class="card">
+      <div class="card__cab"><h2>Estado ante el SII</h2>{% badge_sii d %}</div>
+      <div class="card__cuerpo">
+        {% if d.estado_sii == 'pendiente' %}
+          <div class="aviso">No se pudo confirmar la emisión. Usa <strong>Reintentar emisión</strong>: no se duplicará el documento.</div>
+        {% elif d.estado_sii == 'enviado' %}
+          <div class="aviso aviso--info">El documento fue recibido y está esperando la respuesta del SII (normalmente menos de 3 minutos). Cuando sea aceptado se enviará automáticamente al cliente.</div>
+        {% elif d.estado_sii == 'rechazado' %}
+          <div class="aviso aviso--error">El documento fue rechazado y <strong>no tiene validez</strong>. Corrige los datos y vuelve a emitir desde la cotización.</div>
+        {% elif aceptado %}
+          <div class="aviso aviso--info" style="background:var(--verde-suave);color:#0f5e34">Documento válido ante el SII.{% if d.enviado_al_cliente_en %} Enviado a {{ d.cliente.correo }} el {{ d.enviado_al_cliente_en|date:"d/m/Y \a \l\a\s H:i" }}.{% endif %}</div>
+        {% endif %}
+
+        {% if d.error_mensaje %}<div class="aviso aviso--error" style="margin-top:12px"><strong>Detalle:</strong> {{ d.error_mensaje }}</div>{% endif %}
+        {% if d.advertencias %}<div class="aviso" style="margin-top:12px"><strong>Advertencias del proveedor:</strong><br>{{ d.advertencias|linebreaksbr }}</div>{% endif %}
+
+        <dl class="datos" style="margin-top:18px">
+          <dt>Tipo</dt><dd>{{ d.get_tipo_dte_display }} ({{ d.tipo_dte }})</dd>
+          <dt>Folio</dt><dd>{{ d.folio|default:"—" }}</dd>
+          <dt>Fecha emisión</dt><dd>{{ d.fecha_emision|date:"d/m/Y" }}</dd>
+          <dt>Emitido vía</dt><dd>{{ d.emisor_backend }}</dd>
+          {% if d.cotizacion %}<dt>Cotización</dt><dd><a href="{% url 'panel:cotizacion_detalle' d.cotizacion.pk %}">N°{{ d.cotizacion.numero }}</a></dd>{% endif %}
+          {% if d.track_id %}<dt>Seguimiento</dt><dd class="small tenue" style="font-weight:400">{{ d.track_id }}</dd>{% endif %}
+        </dl>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__cab"><h2>Montos</h2></div>
+      <div class="card__cuerpo">
+        <div class="totales" style="max-width:360px;margin-left:auto">
+          <div class="fila"><span>Neto</span><span>{{ d.monto_neto|clp }}</span></div>
+          {% if d.monto_exento %}<div class="fila"><span>Exento</span><span>{{ d.monto_exento|clp }}</span></div>{% endif %}
+          <div class="fila"><span>IVA (19%)</span><span>{{ d.iva|clp }}</span></div>
+          <div class="fila fila--total"><span>TOTAL</span><span>{{ d.total|clp }}</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <aside>
+    <section class="card">
+      <div class="card__cab"><h2>Acciones</h2></div>
+      <div class="card__cuerpo lista-acciones">
+        {% if puede_reintentar %}
+        <form method="post" action="{% url 'panel:documento_accion' d.pk 'reintentar' %}" data-una-vez>{% csrf_token %}
+          <button class="btn btn--primario btn--bloque" type="submit" data-cargando="Reintentando…">{% icono "actualizar" %} Reintentar emisión</button></form>
+        {% endif %}
+        {% if puede_actualizar %}
+        <form method="post" action="{% url 'panel:documento_accion' d.pk 'actualizar' %}" data-una-vez>{% csrf_token %}
+          <button class="btn btn--turquesa btn--bloque" type="submit" data-cargando="Consultando…">{% icono "actualizar" %} Consultar estado al SII</button></form>
+        {% endif %}
+        {% if aceptado %}
+        <form method="post" action="{% url 'panel:documento_accion' d.pk 'enviar' %}" data-una-vez>{% csrf_token %}
+          <button class="btn btn--turquesa btn--bloque" type="submit" data-cargando="Enviando…" {% if not d.cliente.correo %}disabled{% endif %}>
+            {% icono "enviar" %} {% if d.enviado_al_cliente_en %}Reenviar{% else %}Enviar{% endif %} al cliente</button></form>
+        {% endif %}
+        {% if d.pdf %}<a class="btn btn--secundario btn--bloque" href="{% url 'panel:documento_archivo' d.pk 'pdf' %}?descargar=1">{% icono "descargar" %} Descargar PDF</a>{% endif %}
+        {% if d.xml %}<a class="btn btn--secundario btn--bloque" href="{% url 'panel:documento_archivo' d.pk 'xml' %}">{% icono "descargar" %} Descargar XML</a>{% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__cab"><h2>Receptor</h2><a class="small" href="{% url 'panel:cliente_detalle' d.cliente.pk %}">Ver ficha</a></div>
+      <div class="card__cuerpo">
+        <dl class="datos" style="grid-template-columns:90px 1fr">
+          <dt>Razón social</dt><dd>{{ d.cliente.razon_social }}</dd>
+          <dt>RUT</dt><dd>{{ d.cliente.rut|rut }}</dd>
+          <dt>Correo</dt><dd>{{ d.cliente.correo|default:"—" }}</dd>
+        </dl>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% load panel_tags %}
+{% if pagina.paginator.num_pages > 1 %}
+<div class="paginacion">
+  <span>Mostrando {{ pagina.start_index }}–{{ pagina.end_index }} de {{ pagina.paginator.count }}</span>
+  <span class="btns">
+    {% if pagina.has_previous %}<a class="btn btn--secundario btn--sm" href="{% url_con pagina=pagina.previous_page_number %}">Anterior</a>{% endif %}
+    {% if pagina.has_next %}<a class="btn btn--secundario btn--sm" href="{% url_con pagina=pagina.next_page_number %}">Siguiente</a>{% endif %}
+  </span>
+</div>
+{% endif %}
