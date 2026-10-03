@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, F, Q, Sum, Value
+from django.db.models.functions import Replace, Upper
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -38,6 +39,19 @@ ESTADOS_FACTURADOS = (EstadoSII.ENVIADO, EstadoSII.ACEPTADO, EstadoSII.ACEPTADO_
 
 def _paginar(request, queryset):
     return Paginator(queryset, POR_PAGINA).get_page(request.GET.get("pagina"))
+
+
+def _rut_sin_formato(campo: str):
+    """Expresión SQL del RUT sin guion, para buscar '162334069' o '16.233.406-9' por igual."""
+    return Upper(Replace(F(campo), Value("-"), Value("")))
+
+
+def _filtro_rut(queryset, campo: str, q: str):
+    """Anota el RUT sin formato y devuelve (queryset, Q) para buscar por RUT."""
+    limpio = "".join(c for c in q if c.isalnum()).upper()
+    if len(limpio) < 3 or not limpio[:-1].isdigit():
+        return queryset, Q(pk__in=[])
+    return queryset.annotate(_rut_busqueda=_rut_sin_formato(campo)), Q(_rut_busqueda__contains=limpio)
 
 
 def _cotizaciones_con_items():
@@ -98,9 +112,8 @@ def clientes_lista(request):
         n_cotizaciones=Count("cotizaciones", distinct=True)
     ).order_by("razon_social")
     if q:
-        clientes = clientes.filter(
-            Q(razon_social__icontains=q) | Q(rut__icontains=q.replace(".", "")) | Q(correo__icontains=q)
-        )
+        clientes, por_rut = _filtro_rut(clientes, "rut", q)
+        clientes = clientes.filter(Q(razon_social__icontains=q) | por_rut | Q(correo__icontains=q))
     if request.GET.get("inactivos") != "1":
         clientes = clientes.filter(activo=True)
     return render(request, "panel/clientes/lista.html", {"pagina": _paginar(request, clientes), "q": q})
@@ -167,7 +180,8 @@ def cotizaciones_lista(request):
     estado = request.GET.get("estado", "")
     cotizaciones = _cotizaciones_con_items().order_by("-fecha", "-numero")
     if q:
-        filtro = Q(cliente__razon_social__icontains=q) | Q(cliente__rut__icontains=q.replace(".", ""))
+        cotizaciones, por_rut = _filtro_rut(cotizaciones, "cliente__rut", q)
+        filtro = Q(cliente__razon_social__icontains=q) | por_rut
         if q.isdigit():
             filtro |= Q(numero=int(q))
         cotizaciones = cotizaciones.filter(filtro)
@@ -358,7 +372,8 @@ def documentos_lista(request):
         "-fecha_emision", "-folio"
     )
     if q:
-        filtro = Q(cliente__razon_social__icontains=q) | Q(cliente__rut__icontains=q.replace(".", ""))
+        documentos, por_rut = _filtro_rut(documentos, "cliente__rut", q)
+        filtro = Q(cliente__razon_social__icontains=q) | por_rut
         if q.isdigit():
             filtro |= Q(folio=int(q))
         documentos = documentos.filter(filtro)

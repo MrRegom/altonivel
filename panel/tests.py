@@ -137,3 +137,15 @@ class PanelTests(TestCase):
         copia = Cotizacion.objects.exclude(pk=cot.pk).get()
         self.assertEqual(copia.items.count(), 1)
         self.assertEqual(copia.estado, EstadoCotizacion.BORRADOR)
+
+    def test_buscar_cliente_por_rut_con_o_sin_formato(self):
+        for q in ["761920839", "76.192.083-9", "76192083-9", "7619208"]:
+            with self.subTest(q=q):
+                resp = self.client.get(reverse("panel:clientes"), {"q": q})
+                self.assertContains(resp, "Demo SpA")
+        resp = self.client.get(reverse("panel:clientes"), {"q": "999999999"})
+        self.assertNotContains(resp, "Demo SpA")
+
+    def test_campo_rut_marcado_para_validador(self):
+        resp = self.client.get(reverse("panel:cliente_nuevo"))
+        self.assertContains(resp, "data-rut")

@@ -16,7 +16,7 @@ class ClienteForm(forms.ModelForm):
             "correo", "telefono", "contacto", "activo",
         ]
         widgets = {
-            "rut": forms.TextInput(attrs={"placeholder": "76.192.083-9", "autofocus": True}),
+            "rut": forms.TextInput(attrs={"placeholder": "12345678-9", "autofocus": True, "data-rut": ""}),
             "giro": forms.TextInput(attrs={"maxlength": 200}),
         }
         help_texts = {
@@ -97,6 +97,7 @@ ItemFormSet = inlineformset_factory(
 class EmpresaEmisoraForm(forms.ModelForm):
     class Meta:
         model = EmpresaEmisora
+        widgets = {"rut": forms.TextInput(attrs={"placeholder": "12345678-9", "data-rut": ""})}
         fields = [
             "nombre_fantasia", "logo", "sitio_web",
             "rut", "razon_social", "giro", "actividades",
