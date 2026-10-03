@@ -6,39 +6,84 @@
   <title>Ingresar · {{ marca_nombre }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'panel/app.css' %}">
+  <link rel="stylesheet" href="{% static 'panel/login.css' %}">
   <link rel="icon" type="image/png" href="{% static 'panel/img/favicon.png' %}">
 </head>
-<body>
-  <div class="login">
-    <div class="login__caja">
-      <div class="login__marca">
-        <img class="login__dragon" src="{% static 'panel/img/logo.png' %}" alt="">
+<body class="ingreso">
+  <div class="ingreso__linea" aria-hidden="true"></div>
+
+  <section class="galaxia" aria-hidden="true">
+    <div class="nebulosa nebulosa--naranjo"></div>
+    <div class="nebulosa nebulosa--turquesa"></div>
+    <div class="nebulosa nebulosa--celeste"></div>
+    <canvas id="galaxia"></canvas>
+    <div class="galaxia__vineta"></div>
+
+    <div class="galaxia__texto">
+      <div class="galaxia__dragon">
+        <span class="galaxia__halo"></span>
+        <img src="{% static 'panel/img/logo.png' %}" alt="">
       </div>
-      <div class="login__card">
-        <img class="login__logotipo" src="{% static 'panel/img/logotipo.png' %}" alt="{{ marca_nombre }}">
-        <h1>Bienvenido</h1>
-        <p>Ingresa con tu usuario para continuar.</p>
-        {% if form.non_field_errors %}
-          <div class="alerta alerta--error" style="margin-bottom:16px">{% icono "alerta" %}<span>Usuario o contraseña incorrectos.</span></div>
-        {% endif %}
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="next" value="{{ next }}">
-          <div class="campo">
-            <label for="id_username">Usuario</label>
-            <input type="text" name="username" id="id_username" autocomplete="username" autofocus required value="{{ form.username.value|default:'' }}">
-          </div>
-          <div class="campo">
-            <label for="id_password">Contraseña</label>
-            <input type="password" name="password" id="id_password" autocomplete="current-password" required>
-          </div>
-          <button type="submit" class="btn btn--primario btn--bloque" style="padding:12px">Ingresar {% icono "flecha" %}</button>
-        </form>
-      </div>
-      <div class="login__pie">Cotizaciones y facturación electrónica integrada con el SII</div>
+      <div class="galaxia__barra"><span></span><span></span></div>
+      <h2 class="galaxia__titulo">Alto<br><em>Nivel</em></h2>
+      <p class="galaxia__lema">Cotizaciones y facturación electrónica en un solo lugar.</p>
+      <ul class="galaxia__chips">
+        <li>{% icono "cotizacion" %} Cotiza en segundos</li>
+        <li>{% icono "rayo" %} Factura al SII</li>
+        <li>{% icono "enviar" %} Envía por correo</li>
+      </ul>
     </div>
-  </div>
+  </section>
+
+  <main class="acceso">
+    <header class="acceso__cab">
+      <img class="acceso__logotipo" src="{% static 'panel/img/logotipo.png' %}" alt="{{ marca_nombre }}">
+      <span class="acceso__etiqueta">Facturación</span>
+    </header>
+
+    <div class="acceso__cuerpo">
+      <img class="acceso__dragon-movil" src="{% static 'panel/img/logo.png' %}" alt="">
+      <p class="acceso__saludo">Bienvenido de vuelta</p>
+      <h1 class="acceso__titulo">Ingresa al sistema</h1>
+
+      {% if form.non_field_errors %}
+      <div class="alerta alerta--error acceso__error" role="alert">{% icono "alerta" %}<span>Usuario o contraseña incorrectos. Inténtalo de nuevo.</span></div>
+      {% endif %}
+
+      <form method="post" class="acceso__form" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <label class="acceso__label" for="id_username">Usuario</label>
+        <div class="acceso__campo">
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" name="username" id="id_username" autocomplete="username" autofocus required
+                 placeholder="Tu nombre de usuario" value="{{ form.username.value|default:'' }}">
+        </div>
+
+        <label class="acceso__label" for="id_password">Contraseña</label>
+        <div class="acceso__campo">
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" name="password" id="id_password" autocomplete="current-password" required placeholder="Ingresa tu contraseña">
+          <button type="button" class="acceso__ojo" id="ver-clave" aria-label="Mostrar contraseña" aria-pressed="false">
+            {% icono "ver" %}
+          </button>
+        </div>
+
+        <button type="submit" class="acceso__boton" id="boton-ingresar">
+          <span>Ingresar</span> {% icono "flecha" %}
+        </button>
+      </form>
+    </div>
+
+    <footer class="acceso__pie">
+      <span>© {% now "Y" %} Alto Nivel</span>
+      <span class="acceso__sii"><span class="punto"></span> Integrado con el SII</span>
+    </footer>
+  </main>
+
+  <script src="{% static 'panel/login.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,172 @@
+/* =====================================================================
+   Ingreso · Alto Nivel — galaxia animada + panel de acceso
+   ===================================================================== */
+body.ingreso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 480px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--marino);
+  overflow-x: hidden;
+}
+
+/* Línea superior naranjo → turquesa */
+.ingreso__linea {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 10;
+  background: linear-gradient(90deg, var(--naranjo) 0%, var(--naranjo) 35%, var(--turquesa) 65%, var(--celeste) 100%);
+  background-size: 200% 100%;
+  animation: linea 8s linear infinite;
+}
+@keyframes linea { to { background-position: -200% 0; } }
+
+/* ---------- Galaxia ---------- */
+.galaxia {
+  position: relative; overflow: hidden; min-height: 100vh;
+  background:
+    radial-gradient(1200px 800px at 15% 0%, rgba(24, 126, 135, .35), transparent 60%),
+    radial-gradient(900px 700px at 100% 100%, rgba(249, 82, 11, .18), transparent 60%),
+    linear-gradient(160deg, #10203a 0%, #0c1020 45%, #07080f 100%);
+}
+#galaxia { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.nebulosa { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; mix-blend-mode: screen; pointer-events: none; }
+.nebulosa--naranjo { width: 520px; height: 520px; right: -120px; bottom: -140px;
+  background: radial-gradient(circle, rgba(249, 82, 11, .55), transparent 70%); animation: deriva1 22s ease-in-out infinite alternate; }
+.nebulosa--turquesa { width: 640px; height: 640px; left: -180px; top: -200px;
+  background: radial-gradient(circle, rgba(24, 126, 135, .7), transparent 70%); animation: deriva2 26s ease-in-out infinite alternate; }
+.nebulosa--celeste { width: 380px; height: 380px; left: 45%; top: 30%;
+  background: radial-gradient(circle, rgba(61, 191, 232, .35), transparent 70%); animation: deriva3 30s ease-in-out infinite alternate; }
+@keyframes deriva1 { to { transform: translate(-120px, -80px) scale(1.15); } }
+@keyframes deriva2 { to { transform: translate(140px, 90px) scale(1.1); } }
+@keyframes deriva3 { to { transform: translate(-160px, 120px) scale(.85); opacity: .3; } }
+
+.galaxia__vineta { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 30% 40%, transparent 40%, rgba(5, 6, 12, .65) 100%); }
+
+.galaxia__texto { position: absolute; left: 64px; bottom: 64px; right: 64px; color: #fff; z-index: 2; pointer-events: none; }
+
+.galaxia__dragon { position: relative; width: 108px; height: 108px; margin-bottom: 30px; animation: flotar 6s ease-in-out infinite; }
+.galaxia__dragon img { position: relative; width: 100%; height: 100%; border-radius: 24px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 18px 50px rgba(0, 0, 0, .55); }
+.galaxia__halo { position: absolute; inset: -26px; border-radius: 40px;
+  background: conic-gradient(from 0deg, rgba(249, 82, 11, .0), rgba(249, 82, 11, .55), rgba(61, 191, 232, .5), rgba(24, 126, 135, .0), rgba(249, 82, 11, .0));
+  filter: blur(22px); animation: girar 9s linear infinite; }
+@keyframes flotar { 50% { transform: translateY(-10px); } }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.galaxia__barra { display: flex; gap: 6px; margin-bottom: 18px; }
+.galaxia__barra span { display: block; height: 4px; width: 34px; border-radius: 2px; background: var(--naranjo); }
+.galaxia__barra span + span { width: 22px; background: var(--celeste); }
+
+.galaxia__titulo {
+  font-family: var(--titulos); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(54px, 7vw, 104px); line-height: .92; letter-spacing: -1px; margin: 0;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, .45);
+}
+.galaxia__titulo em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--celeste), var(--turquesa) 40%, var(--naranjo) 80%, var(--celeste));
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: brillo 7s ease-in-out infinite;
+}
+@keyframes brillo { 50% { background-position: 100% 0; } }
+
+.galaxia__lema { margin: 18px 0 22px; font-size: 18px; color: rgba(255, 255, 255, .78); max-width: 460px; }
+.galaxia__chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.galaxia__chips li {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  font-size: 13.5px; font-weight: 700; color: #e6ecf5;
+  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
+  backdrop-filter: blur(6px);
+}
+.galaxia__chips li svg.icono { width: 15px; height: 15px; color: var(--naranjo); }
+
+/* ---------- Panel de acceso ---------- */
+.acceso {
+  position: relative; z-index: 3; background: #fff; display: flex; flex-direction: column;
+  padding: 36px 52px 28px; box-shadow: -30px 0 80px rgba(0, 0, 0, .35); min-height: 100vh;
+}
+.acceso__cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.acceso__logotipo { height: 26px; width: auto; }
+.acceso__etiqueta { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--naranjo); padding: 5px 10px; border-radius: 999px; background: var(--naranjo-suave); }
+
+.acceso__cuerpo { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 380px; width: 100%; margin: 0 auto;
+  animation: aparecer .8s cubic-bezier(.2, .8, .2, 1) both .15s; }
+@keyframes aparecer { from { opacity: 0; transform: translateY(18px); } }
+.acceso__dragon-movil { display: none; }
+.acceso__saludo { margin: 0 0 6px; font-size: 13px; font-weight: 900; letter-spacing: 1.6px; text-transform: uppercase; color: var(--turquesa); }
+.acceso__titulo { font-family: var(--titulos); font-size: 32px; font-weight: 800; color: var(--marino); margin: 0 0 30px; letter-spacing: -.4px; }
+.acceso__error { margin-bottom: 20px; }
+
+.acceso__label { display: block; font-size: 13px; font-weight: 900; color: var(--texto-2); margin: 0 0 8px; }
+.acceso__campo { position: relative; margin-bottom: 20px; }
+.acceso__campo > svg.icono { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--tenue);
+  width: 18px; height: 18px; transition: color .2s; pointer-events: none; }
+.acceso__campo input {
+  width: 100%; height: 52px; padding: 0 48px 0 46px; font-size: 15.5px;
+  border: 1.5px solid var(--borde-fuerte); border-radius: 12px; background: #fbfcfd;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.acceso__campo input:focus { border-color: var(--naranjo); background: #fff; box-shadow: 0 0 0 4px rgba(249, 82, 11, .14); outline: none; }
+.acceso__campo:focus-within > svg.icono { color: var(--naranjo); }
+.acceso__ojo { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px;
+  display: grid; place-items: center; border: 0; background: none; border-radius: 8px; color: var(--tenue); cursor: pointer; }
+.acceso__ojo:hover { background: var(--gris-suave); color: var(--texto); }
+.acceso__ojo[aria-pressed="true"] { color: var(--naranjo); }
+
+.acceso__boton {
+  position: relative; overflow: hidden; width: 100%; height: 54px; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  border: 0; border-radius: 12px; cursor: pointer; color: #fff;
+  font-family: var(--cuerpo); font-size: 16px; font-weight: 900; letter-spacing: .3px;
+  background: linear-gradient(100deg, var(--naranjo) 0%, #ff7a2f 50%, var(--naranjo) 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 10px 24px rgba(249, 82, 11, .35);
+  transition: transform .15s, box-shadow .2s, background-position .5s;
+}
+.acceso__boton:hover { background-position: 100% 0; box-shadow: 0 14px 30px rgba(249, 82, 11, .45); transform: translateY(-1px); }
+.acceso__boton:active { transform: translateY(0); }
+.acceso__boton svg.icono { width: 18px; height: 18px; transition: transform .2s; }
+.acceso__boton:hover svg.icono { transform: translateX(4px); }
+.acceso__boton::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .35), transparent); transform: skewX(-20deg);
+  animation: destello 4.5s ease-in-out infinite 1.5s; }
+@keyframes destello { 0%, 70% { left: -60%; } 100% { left: 130%; } }
+.acceso__boton.cargando { pointer-events: none; opacity: .85; }
+
+.acceso__pie { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--tenue); }
+.acceso__sii { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+.acceso__sii .punto { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+  animation: pulso 2s infinite; }
+@keyframes pulso { 70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  body.ingreso { grid-template-columns: minmax(0, 1fr) 420px; }
+  .galaxia__texto { left: 40px; right: 40px; bottom: 44px; }
+  .acceso { padding: 32px 36px 24px; }
+}
+@media (max-width: 820px) {
+  /* En celular la galaxia queda de fondo y el acceso flota como tarjeta */
+  body.ingreso { display: block; }
+  .galaxia { position: fixed; inset: 0; min-height: 0; }
+  .galaxia__texto { display: none; }
+  .acceso { min-height: 100vh; background: transparent; box-shadow: none; padding: 24px 16px; justify-content: center; }
+  .acceso__cab { justify-content: center; }
+  .acceso__logotipo { filter: brightness(0) invert(1); }
+  .acceso__etiqueta { display: none; }
+  .acceso__cuerpo { flex: none; margin: 72px auto 28px; background: #fff; border-radius: 20px; padding: 30px 22px 26px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .5); max-width: 420px; }
+  .acceso__dragon-movil { display: block; width: 72px; height: 72px; border-radius: 18px; margin: -66px auto 14px;
+    border: 4px solid #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, .4); }
+  .acceso__saludo, .acceso__titulo { text-align: center; }
+  .acceso__titulo { font-size: 26px; margin-bottom: 24px; }
+  .acceso__pie { justify-content: center; flex-wrap: wrap; color: rgba(255, 255, 255, .6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ingreso__linea, .nebulosa, .galaxia__dragon, .galaxia__halo, .galaxia__titulo em,
+  .acceso__boton::after, .acceso__sii .punto, .acceso__cuerpo { animation: none !important; }
+}
