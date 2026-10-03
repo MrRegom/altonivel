@@ -6,7 +6,7 @@
 {% block subtitulo %}<div class="subtitulo">RUT {{ cliente.rut|rut }}{% if not cliente.activo %} · Inactivo{% endif %}</div>{% endblock %}
 {% block acciones %}
   <a class="btn btn--claro" href="{% url 'panel:cliente_editar' cliente.pk %}">{% icono "editar" %} Editar</a>
-  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}?cliente={{ cliente.pk }}">{% icono "mas" %} Cotizar</a>
+  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}?cliente={{ cliente.pk }}">Cotizar</a>
 {% endblock %}
 
 {% block contenido %}

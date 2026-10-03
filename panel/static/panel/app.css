@@ -221,8 +221,9 @@ svg.icono { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: n
 /* ---------- Barra de herramientas / filtros ---------- */
 .herramientas { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
 .buscador { position: relative; flex: 1; min-width: 220px; max-width: 420px; }
-.buscador svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--tenue); }
-.buscador input { padding-left: 38px; }
+.buscador svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--tenue);
+  pointer-events: none; z-index: 1; }
+.buscador input[type=search] { padding-left: 40px; height: 40px; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
   border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto-2);

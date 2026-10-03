@@ -1,0 +1,162 @@
+/* =====================================================================
+   Admin de Django con la marca Alto Nivel (modo claro y oscuro)
+   ===================================================================== */
+html[data-theme="light"], :root {
+  --primary: #187e87;
+  --secondary: #161725;
+  --accent: #f9520b;
+  --primary-fg: #fff;
+
+  --body-fg: #171a26;
+  --body-bg: #ffffff;
+  --body-quiet-color: #6b7385;
+  --body-medium-color: #3a4152;
+  --body-loud-color: #0b0c14;
+
+  --header-color: #c9ccdb;
+  --header-branding-color: #fff;
+  --header-bg: #161725;
+  --header-link-color: #fff;
+
+  --breadcrumbs-fg: rgba(255, 255, 255, .78);
+  --breadcrumbs-link-fg: #fff;
+  --breadcrumbs-bg: #187e87;
+
+  --link-fg: #187e87;
+  --link-hover-color: #f9520b;
+  --link-selected-fg: #12616a;
+
+  --hairline-color: #e6e9ef;
+  --border-color: #cdd3de;
+  --darkened-bg: #f6f7fa;
+  --selected-bg: #e4f3f4;
+  --selected-row: #fff0e8;
+
+  --button-fg: #fff;
+  --button-bg: #187e87;
+  --button-hover-bg: #12616a;
+  --default-button-bg: #f9520b;
+  --default-button-hover-bg: #e04607;
+
+  --object-tools-fg: #fff;
+  --object-tools-bg: #187e87;
+  --object-tools-hover-bg: #f9520b;
+
+  --message-success-bg: #e3f5ea;
+  --message-warning-bg: #fdf3dc;
+  --message-error-bg: #fdeaea;
+
+  --font-family-primary: "Lato", "Segoe UI", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #187e87;
+    --secondary: #0d0e18;
+    --primary-fg: #f2f4fa;
+    --body-fg: #e4e7f0;
+    --body-bg: #12131f;
+    --body-quiet-color: #9aa0b4;
+    --body-medium-color: #c3c8d6;
+    --body-loud-color: #fff;
+    --header-bg: #0b0c15;
+    --breadcrumbs-bg: #14505b;
+    --link-fg: #3dbfe8;
+    --link-hover-color: #ff7a2f;
+    --link-selected-fg: #7fd6f2;
+    --hairline-color: #262a3d;
+    --border-color: #353852;
+    --darkened-bg: #1a1c2b;
+    --selected-bg: #1d3a44;
+    --selected-row: #3a2214;
+    --button-bg: #187e87;
+    --button-hover-bg: #1f97a1;
+    --default-button-bg: #f9520b;
+    --default-button-hover-bg: #ff6a26;
+    --object-tools-bg: #187e87;
+    --object-tools-hover-bg: #f9520b;
+    --message-success-bg: #10351f;
+    --message-warning-bg: #3a2e10;
+    --message-error-bg: #3d1515;
+  }
+}
+html[data-theme="dark"] {
+  --primary: #187e87;
+  --secondary: #0d0e18;
+  --primary-fg: #f2f4fa;
+  --body-fg: #e4e7f0;
+  --body-bg: #12131f;
+  --body-quiet-color: #9aa0b4;
+  --body-medium-color: #c3c8d6;
+  --body-loud-color: #fff;
+  --header-bg: #0b0c15;
+  --breadcrumbs-bg: #14505b;
+  --link-fg: #3dbfe8;
+  --link-hover-color: #ff7a2f;
+  --link-selected-fg: #7fd6f2;
+  --hairline-color: #262a3d;
+  --border-color: #353852;
+  --darkened-bg: #1a1c2b;
+  --selected-bg: #1d3a44;
+  --selected-row: #3a2214;
+  --button-bg: #187e87;
+  --button-hover-bg: #1f97a1;
+  --default-button-bg: #f9520b;
+  --default-button-hover-bg: #ff6a26;
+  --object-tools-bg: #187e87;
+  --object-tools-hover-bg: #f9520b;
+  --message-success-bg: #10351f;
+  --message-warning-bg: #3a2e10;
+  --message-error-bg: #3d1515;
+}
+
+/* ---------- Encabezado ---------- */
+#header {
+  background: linear-gradient(90deg, #161725 0%, #161725 55%, #14505b 100%);
+  border-bottom: 3px solid #f9520b;
+  padding: 12px 40px;
+}
+.an-marca { display: inline-flex; align-items: center; gap: 12px; text-decoration: none !important; }
+.an-marca img { width: 40px; height: 40px; border-radius: 9px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 4px 14px rgba(249, 82, 11, .3); }
+.an-marca__texto { display: flex; flex-direction: column; line-height: 1;
+  font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 19px; color: #fff; text-transform: uppercase; letter-spacing: .4px; }
+.an-marca__texto small { margin-top: 5px; font-family: "Lato", sans-serif; font-size: 10.5px; font-weight: 900;
+  letter-spacing: 2px; color: #f9520b; }
+#user-tools { font-size: 12px; letter-spacing: .3px; }
+#user-tools a { border-bottom-color: rgba(255, 255, 255, .25); }
+#user-tools a:hover { color: #f9520b; border-bottom-color: #f9520b; }
+
+div.breadcrumbs { background: linear-gradient(90deg, #187e87, #14505b); padding: 12px 40px; }
+
+/* ---------- Contenido ---------- */
+#content h1, #content h2, #content-main h2 { font-family: "Montserrat", sans-serif; font-weight: 800; }
+#content > h1 { font-size: 24px; color: var(--body-loud-color); }
+
+.module { border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(22, 23, 37, .06), 0 2px 8px rgba(22, 23, 37, .05);
+  border: 1px solid var(--hairline-color); }
+.module h2, .module caption, .inline-group h2 {
+  font-family: "Montserrat", sans-serif; font-weight: 800; letter-spacing: .8px;
+  background: linear-gradient(90deg, #187e87, #14505b); padding: 10px 14px;
+}
+.module h2 a.section, .module caption a.section { color: #fff; }
+#content-related .module h2 { background: #161725; color: #fff; }
+
+/* Botones */
+.button, input[type=submit], input[type=button], .submit-row input, a.button { border-radius: 8px; font-weight: 700; }
+.submit-row { border-radius: 10px; }
+.object-tools a { border-radius: 999px; font-weight: 700; }
+
+/* Tablas */
+#changelist table thead th, table thead th { font-weight: 800; letter-spacing: .5px; }
+#changelist-filter h2 { background: #161725; color: #fff; border-radius: 10px 10px 0 0; }
+#changelist-filter { border-radius: 10px; overflow: hidden; }
+
+/* Login del admin */
+.login #header { justify-content: center; }
+.login #container { border-radius: 14px; overflow: hidden; border-top: 4px solid #f9520b; }
+
+/* Enlace de vuelta al panel */
+.an-volver { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+  background: #f9520b; color: #fff !important; font-weight: 900; text-decoration: none !important; border: 0 !important; }
+.an-volver:hover { background: #e04607; }

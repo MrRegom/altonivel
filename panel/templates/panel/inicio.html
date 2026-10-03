@@ -5,7 +5,7 @@
 {% block subtitulo %}<div class="subtitulo">Resumen de {{ mes|date:"F Y" }}</div>{% endblock %}
 {% block acciones %}
   <a class="btn btn--claro" href="{% url 'panel:cliente_nuevo' %}">{% icono "clientes" %} Nuevo cliente</a>
-  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+  <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>
 {% endblock %}
 
 {% block contenido %}
@@ -69,7 +69,7 @@
         {% icono "cotizacion" %}
         <h3>Aún no hay cotizaciones</h3>
         <p>Crea la primera en menos de un minuto.</p>
-        <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+        <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>
       </div>
       {% endif %}
     </section>

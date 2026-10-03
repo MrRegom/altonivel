@@ -2,7 +2,7 @@
 {% load panel_tags %}
 {% block titulo %}Cotizaciones{% endblock %}
 {% block encabezado %}Cotizaciones{% endblock %}
-{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>{% endblock %}
 
 {% block contenido %}
 <form class="herramientas" method="get">
@@ -41,7 +41,7 @@
     {% icono "cotizacion" %}
     {% if q or estado %}<h3>No hay cotizaciones con ese filtro</h3><p><a href="{% url 'panel:cotizaciones' %}">Ver todas</a></p>
     {% else %}<h3>Aún no hay cotizaciones</h3><p>Arma tu primera cotización con productos de tu catálogo.</p>
-    <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>{% endif %}
+    <a class="btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>{% endif %}
   </div>
   {% endif %}
 </section>

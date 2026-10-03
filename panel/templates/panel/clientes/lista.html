@@ -3,7 +3,7 @@
 {% block titulo %}Clientes{% endblock %}
 {% block encabezado %}Clientes{% endblock %}
 {% block subtitulo %}<div class="subtitulo">Se registran una vez y quedan listos para cotizar y facturar.</div>{% endblock %}
-{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">{% icono "mas" %} Nuevo cliente</a>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">Nuevo cliente</a>{% endblock %}
 
 {% block contenido %}
 <form class="herramientas" method="get">
@@ -39,7 +39,7 @@
     {% icono "clientes" %}
     {% if q %}<h3>Sin resultados para «{{ q }}»</h3><p>Prueba con otro nombre o RUT.</p>
     {% else %}<h3>Todavía no hay clientes</h3><p>Registra a tu primer cliente con su RUT y datos de facturación.</p>{% endif %}
-    <a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">{% icono "mas" %} Nuevo cliente</a>
+    <a class="btn btn--primario" href="{% url 'panel:cliente_nuevo' %}">Nuevo cliente</a>
   </div>
   {% endif %}
 </section>

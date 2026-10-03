@@ -23,7 +23,7 @@
     </a>
 
     <nav class="nav">
-      <a class="nav__cta btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %} Nueva cotización</a>
+      <a class="nav__cta btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>
       <a class="{% activo '/' %}" href="{% url 'panel:inicio' %}">{% icono "inicio" %} Inicio</a>
       <a class="{% activo '/cotizaciones/' %}" href="{% url 'panel:cotizaciones' %}">{% icono "cotizacion" %} Cotizaciones</a>
       <a class="{% activo '/facturas/' %}" href="{% url 'panel:documentos' %}">{% icono "factura" %} Facturas</a>
@@ -50,7 +50,7 @@
     <div class="barra-movil">
       <button type="button" id="abrir-menu" aria-label="Abrir menú">{% icono "menu" %}</button>
       <span class="marca__nombre">{{ marca_nombre }}</span>
-      <a class="btn btn--primario btn--sm" href="{% url 'panel:cotizacion_nueva' %}">{% icono "mas" %}</a>
+      <a class="btn btn--primario btn--sm" href="{% url 'panel:cotizacion_nueva' %}">Cotizar</a>
     </div>
 
     {% if modo_prueba %}

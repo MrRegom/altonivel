@@ -8,14 +8,20 @@ from django.core.management.base import BaseCommand
 
 from facturacion.models import EmpresaEmisora
 
+# El RUT, la actividad y la sucursal son los de la empresa de prueba que
+# OpenFactura asocia a la API key pública (no se pueden cambiar). El nombre
+# y el giro se muestran como Alto Nivel; OpenFactura solo advierte que la
+# razón social no coincide con su registro, pero emite igual.
 DEMO = {
     "rut": "76795561-8",
-    "razon_social": "HAULMER CHILE SPA",
-    "giro": "VENTA AL POR MENOR EN EMPRESAS DE VENTA A DISTANCIA VÍA INTERNET; COMERCIO ELEC",
+    "razon_social": "ALTO NIVEL",
+    "nombre_fantasia": "Alto Nivel",
+    "giro": "VENTA DE EQUIPOS COMPUTACIONALES Y HARDWARE",
     "actividades": "479100",
-    "direccion": "ARTURO PRAT 527 CURICO",
+    "direccion": "ARTURO PRAT 527",
     "comuna": "Curicó",
     "codigo_sucursal": "81303347",
+    "sitio_web": "altonivel.cl",
 }
 API_KEY_DEMO = "928e15a2d14d4a6292345f04960f4bd3"
 

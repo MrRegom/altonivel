@@ -3,7 +3,7 @@
 {% block titulo %}Productos{% endblock %}
 {% block encabezado %}Productos y servicios{% endblock %}
 {% block subtitulo %}<div class="subtitulo">Tu catálogo: se agregan a una cotización con un clic.</div>{% endblock %}
-{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">{% icono "mas" %} Nuevo producto</a>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">Nuevo producto</a>{% endblock %}
 
 {% block contenido %}
 <form class="herramientas" method="get">
@@ -39,7 +39,7 @@
     {% icono "productos" %}
     {% if q %}<h3>Sin resultados para «{{ q }}»</h3><p>Prueba con otro nombre o código.</p>
     {% else %}<h3>Tu catálogo está vacío</h3><p>Agrega los productos y servicios que vendes para cotizar más rápido.</p>{% endif %}
-    <a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">{% icono "mas" %} Nuevo producto</a>
+    <a class="btn btn--primario" href="{% url 'panel:producto_nuevo' %}">Nuevo producto</a>
   </div>
   {% endif %}
 </section>

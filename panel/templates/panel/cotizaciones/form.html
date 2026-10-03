@@ -23,7 +23,7 @@
               <label for="{{ form.cliente.id_for_label }}">Cliente <span class="req">*</span></label>
               <div style="display:flex;gap:8px">
                 <div style="flex:1">{{ form.cliente }}</div>
-                <a class="btn btn--secundario" href="{% url 'panel:cliente_nuevo' %}?next=cotizacion" title="Registrar un cliente nuevo">{% icono "mas" %} Nuevo</a>
+                <a class="btn btn--secundario" href="{% url 'panel:cliente_nuevo' %}?next=cotizacion" title="Registrar un cliente nuevo">Nuevo</a>
               </div>
               {{ form.cliente.errors }}
             </div>
@@ -49,7 +49,7 @@
             </tbody>
           </table>
           <template id="item-vacio">{% with f=formset.empty_form %}{% include "panel/cotizaciones/_fila_item.html" %}{% endwith %}</template>
-          <button type="button" class="btn btn--secundario agregar-item" id="agregar-item">{% icono "mas" %} Agregar ítem</button>
+          <button type="button" class="btn btn--secundario agregar-item" id="agregar-item">Agregar ítem</button>
         </div>
       </section>
 
