@@ -4,26 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}Panel{% endblock %} · {{ marca_nombre }}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'panel/app.css' %}">
   <link rel="icon" type="image/png" href="{% static 'panel/img/favicon.png' %}">
 </head>
 <body>
+<header class="appbar">
+  <button type="button" class="appbar__menu" id="abrir-menu" aria-label="Abrir menú">{% icono "menu" %}</button>
+  <a class="appbar__marca" href="{% url 'panel:inicio' %}">
+    {% if marca_logo %}
+      <img class="appbar__logo" src="{{ marca_logo }}" alt="">
+    {% else %}
+      <img class="appbar__logo" src="{% static 'panel/img/logo.png' %}" alt="">
+    {% endif %}
+    <span class="appbar__nombre">{{ marca_nombre }}</span>
+    <span class="appbar__producto">Facturación</span>
+  </a>
+  <div class="appbar__der">
+    {% if user.is_superuser %}
+    <a class="appbar__icono" href="{% url 'admin:index' %}" title="Administración" aria-label="Administración">{% icono "admin" %}</a>
+    {% endif %}
+    <div class="appbar__usuario" title="{{ user.get_full_name|default:user.get_username }}">
+      <span class="avatar">{{ user.get_username|first|upper }}</span>
+      <span class="appbar__usuario-nombre">{{ user.get_full_name|default:user.get_username }}</span>
+    </div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="appbar__icono" title="Cerrar sesión" aria-label="Cerrar sesión">{% icono "salir" %}</button>
+    </form>
+  </div>
+</header>
+
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <a class="marca" href="{% url 'panel:inicio' %}">
-      {% if marca_logo %}
-        <img class="marca__logo" src="{{ marca_logo }}" alt="{{ marca_nombre }}">
-      {% else %}
-        <img class="marca__dragon" src="{% static 'panel/img/logo.png' %}" alt="">
-        <span><span class="marca__nombre">{{ marca_nombre }}</span><span class="marca__sub">Facturación</span></span>
-      {% endif %}
-    </a>
-
-    <nav class="nav">
-      <a class="nav__cta btn btn--primario" href="{% url 'panel:cotizacion_nueva' %}">Nueva cotización</a>
+    <div class="sidebar__accion">
+      <a class="btn btn--primario btn--bloque" href="{% url 'panel:cotizacion_nueva' %}">{% icono "cotizacion" %} Nueva cotización</a>
+    </div>
+    <nav class="nav" aria-label="Navegación principal">
       <a class="{% activo '/' %}" href="{% url 'panel:inicio' %}">{% icono "inicio" %} Inicio</a>
       <a class="{% activo '/cotizaciones/' %}" href="{% url 'panel:cotizaciones' %}">{% icono "cotizacion" %} Cotizaciones</a>
       <a class="{% activo '/facturas/' %}" href="{% url 'panel:documentos' %}">{% icono "factura" %} Facturas</a>
@@ -35,37 +51,19 @@
       <a href="{% url 'admin:index' %}">{% icono "admin" %} Administración</a>
       {% endif %}
     </nav>
-
-    <div class="sidebar__pie">
-      <span class="avatar">{{ user.get_username|first|upper }}</span>
-      <span class="usuario">{{ user.get_full_name|default:user.get_username }}</span>
-      <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit" title="Cerrar sesión" aria-label="Cerrar sesión">{% icono "salir" %}</button>
-      </form>
-    </div>
   </aside>
 
   <div class="principal">
-    <div class="barra-movil">
-      <button type="button" id="abrir-menu" aria-label="Abrir menú">{% icono "menu" %}</button>
-      <span class="marca__nombre">{{ marca_nombre }}</span>
-      <a class="btn btn--primario btn--sm" href="{% url 'panel:cotizacion_nueva' %}">Cotizar</a>
-    </div>
-
     {% if modo_prueba %}
-    <div class="modo-prueba">{% icono "alerta" %} MODO PRUEBA · Las facturas que se emiten aquí no tienen validez tributaria.</div>
+    <div class="modo-prueba" role="status">{% icono "alerta" %}<span><strong>Modo prueba.</strong> Las facturas que se emiten aquí no tienen validez tributaria.</span></div>
     {% endif %}
+
     <header class="encabezado">
-      <div class="encabezado__fila">
-        <div>
-          {% block miga %}{% endblock %}
-          <h1>{% block encabezado %}{% endblock %}</h1>
-          {% block subtitulo %}{% endblock %}
-        </div>
-        <div class="acciones">{% block acciones %}{% endblock %}</div>
-      </div>
+      {% block miga %}{% endblock %}
+      <h1>{% block encabezado %}{% endblock %}</h1>
+      {% block subtitulo %}{% endblock %}
     </header>
+    <div class="comandos">{% block acciones %}{% endblock %}</div>
 
     <main class="contenido">
       {% if messages %}

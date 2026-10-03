@@ -27,12 +27,12 @@
         <img src="{% static 'panel/img/logo.png' %}" alt="">
       </div>
       <div class="galaxia__barra"><span></span><span></span></div>
-      <h2 class="galaxia__titulo">Alto<br><em>Nivel</em></h2>
+      <h2 class="galaxia__titulo"><img src="{% static 'panel/img/logotipo-claro.png' %}" alt="Alto Nivel"></h2>
       <p class="galaxia__lema">Cotizaciones y facturación electrónica en un solo lugar.</p>
       <ul class="galaxia__chips">
-        <li>{% icono "cotizacion" %} Cotiza en segundos</li>
-        <li>{% icono "rayo" %} Factura al SII</li>
-        <li>{% icono "enviar" %} Envía por correo</li>
+        <li style="--i:0">{% icono "cotizacion" %} Cotiza en segundos</li>
+        <li style="--i:1">{% icono "rayo" %} Factura al SII</li>
+        <li style="--i:2">{% icono "enviar" %} Envía por correo</li>
       </ul>
     </div>
   </section>

@@ -19,6 +19,8 @@
   var nodos = [], estrellas = [], fugaces = [];
   var raton = { x: -9999, y: -9999, activo: false };
   var DISTANCIA = 150, RADIO_RATON = 190;
+  // Con "reducir movimiento" la galaxia sigue viva, pero más lenta y sin estrellas fugaces.
+  var VELOCIDAD = reducido ? 0.45 : 1;
 
   function azar(a, b) { return a + Math.random() * (b - a); }
 
@@ -93,7 +95,7 @@
       var vel = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
       if (vel < 0.12) { p.vx += azar(-0.03, 0.03); p.vy += azar(-0.03, 0.03); }
       if (vel > 1.6) { p.vx *= 0.9; p.vy *= 0.9; }
-      p.x += p.vx; p.y += p.vy;
+      p.x += p.vx * VELOCIDAD; p.y += p.vy * VELOCIDAD;
       if (p.x < -20) p.x = ancho + 20; else if (p.x > ancho + 20) p.x = -20;
       if (p.y < -20) p.y = alto + 20; else if (p.y > alto + 20) p.y = -20;
     }
@@ -162,7 +164,7 @@
       if (fz.vida <= 0 || fz.x < -200 || fz.y > alto + 200) fugaces.splice(f, 1);
     }
 
-    if (!reducido) requestAnimationFrame(cuadro);
+    requestAnimationFrame(cuadro);
   }
 
   var galaxia = canvas.parentElement;
@@ -181,7 +183,7 @@
   var redim;
   window.addEventListener("resize", function () {
     clearTimeout(redim);
-    redim = setTimeout(function () { crear(); if (reducido) cuadro(); }, 150);
+    redim = setTimeout(crear, 150);
   });
 
   crear();
