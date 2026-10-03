@@ -43,18 +43,18 @@
       <h1 class="acceso__titulo">Ingresa al sistema</h1>
 
       {% if form.non_field_errors %}
-      <div class="alerta alerta--error acceso__error" role="alert">{% icono "alerta" %}<span>Usuario o contraseña incorrectos. Inténtalo de nuevo.</span></div>
+      <div class="alerta alerta--error acceso__error" role="alert">{% icono "alerta" %}<span>{{ form.non_field_errors|join:" " }}</span></div>
       {% endif %}
 
       <form method="post" class="acceso__form" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
 
-        <label class="acceso__label" for="id_username">Usuario</label>
+        <label class="acceso__label" for="id_username">RUT</label>
         <div class="acceso__campo">
           <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <input type="text" name="username" id="id_username" autocomplete="username" autofocus required
-                 placeholder="Tu nombre de usuario" value="{{ form.username.value|default:'' }}">
+                 data-rut inputmode="text" placeholder="12.345.678-9" value="{{ form.username.value|default:'' }}">
         </div>
 
         <label class="acceso__label" for="id_password">Contraseña</label>
@@ -77,6 +77,7 @@
     </footer>
   </main>
 
+  <script src="{% static 'panel/app.js' %}"></script>
   <script src="{% static 'panel/login.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,22 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Cambiar mi contraseña{% endblock %}
+{% block encabezado %}Cambiar mi contraseña{% endblock %}
+{% block subtitulo %}<div class="subtitulo">RUT {{ user.username|rut }}</div>{% endblock %}
+
+{% block contenido %}
+<form method="post" class="card" style="max-width:520px" novalidate>
+  {% csrf_token %}
+  <div class="card__cuerpo">
+    <div class="form-grid" style="grid-template-columns:1fr">
+      {% include "panel/_campo.html" with f=form.old_password %}
+      {% include "panel/_campo.html" with f=form.new_password1 %}
+      {% include "panel/_campo.html" with f=form.new_password2 %}
+    </div>
+  </div>
+  <div class="card__pie form-acciones">
+    <a class="btn btn--fantasma" href="{% url 'panel:inicio' %}">Cancelar</a>
+    <button class="btn btn--primario" type="submit">Guardar contraseña</button>
+  </div>
+</form>
+{% endblock %}

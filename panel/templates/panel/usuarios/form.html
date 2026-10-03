@@ -1,0 +1,35 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}{% if usuario %}Editar usuario{% else %}Nuevo usuario{% endif %}{% endblock %}
+{% block miga %}<div class="miga">Configuración / <a href="{% url 'panel:usuarios' %}">Usuarios</a></div>{% endblock %}
+{% block encabezado %}{% if usuario %}{{ usuario.get_full_name|default:"Editar usuario" }}{% else %}Nuevo usuario{% endif %}{% endblock %}
+{% block acciones %}
+  {% if usuario %}<a class="btn" href="{% url 'panel:usuario_clave' usuario.pk %}">Cambiar contraseña</a>{% endif %}
+{% endblock %}
+
+{% block contenido %}
+<form method="post" class="card" style="max-width:820px" novalidate autocomplete="off">
+  {% csrf_token %}
+  <div class="card__cuerpo">
+    {% if form.non_field_errors %}<div class="aviso aviso--error" style="margin-bottom:16px">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    <div class="form-grid">
+      <div class="seccion-form">Datos de acceso</div>
+      {% include "panel/_campo.html" with f=form.rut %}
+      {% include "panel/_campo.html" with f=form.rol %}
+      {% if form.clave1 %}
+        {% include "panel/_campo.html" with f=form.clave1 %}
+        {% include "panel/_campo.html" with f=form.clave2 %}
+      {% endif %}
+      <div class="seccion-form">Datos personales</div>
+      {% include "panel/_campo.html" with f=form.first_name %}
+      {% include "panel/_campo.html" with f=form.last_name %}
+      {% include "panel/_campo.html" with f=form.email %}
+      {% if usuario %}{% include "panel/_campo.html" with f=form.is_active %}{% endif %}
+    </div>
+  </div>
+  <div class="card__pie form-acciones">
+    <a class="btn btn--fantasma" href="{% url 'panel:usuarios' %}">Cancelar</a>
+    <button class="btn btn--primario" type="submit">Guardar usuario</button>
+  </div>
+</form>
+{% endblock %}

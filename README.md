@@ -87,7 +87,7 @@ En el servidor (Ubuntu con Docker y Docker Compose):
 ```bash
 git clone https://github.com/MrRegom/altonivel.git /opt/altonivel
 cd /opt/altonivel && bash servidor.sh
-docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py admin_rut <tu-rut>
 ```
 
 La app queda en `http://<ip-del-servidor>:8090`. Para actualizar después de
@@ -97,6 +97,9 @@ subir cambios a GitHub: `cd /opt/altonivel && bash servidor.sh`.
   Ahí se configuran el correo SMTP y la API key de OpenFactura.
 - Base de datos, PDF y XML quedan en el volumen Docker `altonivel_data`.
 - El contenedor `altonivel-estados` consulta al SII cada 5 minutos.
+- Se ingresa con **RUT y contraseña**. `admin_rut` crea el superadministrador
+  (o convierte uno existente). Los demás usuarios se crean en el panel:
+  Configuración → Usuarios.
 
 ## Estructura
 

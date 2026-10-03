@@ -5,8 +5,10 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from django.views.static import serve
 
+from panel.forms import IngresoRutForm
+
 urlpatterns = [
-    path("ingresar/", auth_views.LoginView.as_view(), name="login"),
+    path("ingresar/", auth_views.LoginView.as_view(authentication_form=IngresoRutForm), name="login"),
     path("salir/", auth_views.LogoutView.as_view(), name="logout"),
     path("admin/", admin.site.urls),
     path("", include("panel.urls")),

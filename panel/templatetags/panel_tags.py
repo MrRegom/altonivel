@@ -129,6 +129,7 @@ _ICONOS = {
     "quitar": '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2"/>',
     "rayo": '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
     "flecha": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    "llave": '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
     "correo": '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
 }
 

@@ -27,4 +27,9 @@ urlpatterns = [
     path("facturas/<int:pk>/<str:accion>/", views.documento_accion, name="documento_accion"),
     path("facturas/<int:pk>/archivo/<str:formato>/", views.documento_archivo, name="documento_archivo"),
     path("configuracion/empresa/", views.empresa, name="empresa"),
+    path("configuracion/usuarios/", views.usuarios_lista, name="usuarios"),
+    path("configuracion/usuarios/nuevo/", views.usuario_form, name="usuario_nuevo"),
+    path("configuracion/usuarios/<int:pk>/", views.usuario_form, name="usuario_editar"),
+    path("configuracion/usuarios/<int:pk>/clave/", views.usuario_clave, name="usuario_clave"),
+    path("mi-clave/", views.mi_clave, name="mi_clave"),
 ]

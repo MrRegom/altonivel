@@ -4,8 +4,12 @@ from __future__ import annotations
 from datetime import timedelta
 from decimal import Decimal
 
+from functools import wraps
+
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count, F, Q, Sum, Value
@@ -24,6 +28,8 @@ from ventas import services
 from ventas.models import Cotizacion, DocumentoTributario, EstadoCotizacion
 
 from .forms import (
+    Usuario,
+    UsuarioForm,
     ClienteForm,
     CotizacionForm,
     EmpresaEmisoraForm,
@@ -443,7 +449,21 @@ def documento_archivo(request, pk, formato):
 # ----------------------------------------------------------------------
 # Configuración
 # ----------------------------------------------------------------------
-@login_required
+def solo_admin(vista):
+    """Restringe la vista a administradores (usuarios con rol Administrador)."""
+
+    @wraps(vista)
+    @login_required
+    def envoltura(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Esta sección es solo para administradores.")
+            return redirect("panel:inicio")
+        return vista(request, *args, **kwargs)
+
+    return envoltura
+
+
+@solo_admin
 def empresa(request):
     instancia = EmpresaEmisora.objects.first()
     form = EmpresaEmisoraForm(request.POST or None, request.FILES or None, instance=instancia)
@@ -452,3 +472,61 @@ def empresa(request):
         messages.success(request, "Datos de la empresa guardados.")
         return redirect("panel:empresa")
     return render(request, "panel/empresa.html", {"form": form, "empresa": instancia})
+
+
+# ----------------------------------------------------------------------
+# Usuarios
+# ----------------------------------------------------------------------
+def formatear_busqueda_rut(limpio: str) -> str:
+    """'162334069' -> '16233406-9' para buscar contra el RUT guardado."""
+    if len(limpio) >= 8 and limpio[:-1].isdigit():
+        return f"{limpio[:-1]}-{limpio[-1].upper()}"
+    return limpio
+
+
+@solo_admin
+def usuarios_lista(request):
+    q = request.GET.get("q", "").strip()
+    usuarios = Usuario.objects.order_by("-is_active", "first_name", "last_name")
+    if q:
+        limpio = "".join(c for c in q if c.isalnum())
+        usuarios = usuarios.filter(
+            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q)
+            | Q(username__icontains=formatear_busqueda_rut(limpio))
+        )
+    return render(request, "panel/usuarios/lista.html", {"pagina": _paginar(request, usuarios), "q": q})
+
+
+@solo_admin
+def usuario_form(request, pk=None):
+    usuario = get_object_or_404(Usuario, pk=pk) if pk else None
+    form = UsuarioForm(request.POST or None, instance=usuario, editor=request.user)
+    if request.method == "POST" and form.is_valid():
+        usuario = form.save()
+        messages.success(request, f"Usuario {usuario.get_full_name() or usuario.username} guardado.")
+        return redirect("panel:usuarios")
+    return render(request, "panel/usuarios/form.html", {"form": form, "usuario": usuario})
+
+
+@solo_admin
+def usuario_clave(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+    form = SetPasswordForm(usuario, request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        if usuario.pk == request.user.pk:
+            update_session_auth_hash(request, usuario)
+        messages.success(request, f"Contraseña de {usuario.get_full_name() or usuario.username} actualizada.")
+        return redirect("panel:usuarios")
+    return render(request, "panel/usuarios/clave.html", {"form": form, "usuario": usuario})
+
+
+@login_required
+def mi_clave(request):
+    form = PasswordChangeForm(request.user, request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        update_session_auth_hash(request, form.user)
+        messages.success(request, "Tu contraseña fue actualizada.")
+        return redirect("panel:inicio")
+    return render(request, "panel/mi_clave.html", {"form": form})

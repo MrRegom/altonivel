@@ -20,11 +20,9 @@
     <span class="appbar__producto">Facturación</span>
   </a>
   <div class="appbar__der">
-    {% if user.is_superuser %}
-    <a class="appbar__icono" href="{% url 'admin:index' %}" title="Administración" aria-label="Administración">{% icono "admin" %}</a>
-    {% endif %}
+    <a class="appbar__icono" href="{% url 'panel:mi_clave' %}" title="Cambiar mi contraseña" aria-label="Cambiar mi contraseña">{% icono "llave" %}</a>
     <div class="appbar__usuario" title="{{ user.get_full_name|default:user.get_username }}">
-      <span class="avatar">{{ user.get_username|first|upper }}</span>
+      <span class="avatar">{{ user.first_name|default:user.get_username|first|upper }}</span>
       <span class="appbar__usuario-nombre">{{ user.get_full_name|default:user.get_username }}</span>
     </div>
     <form method="post" action="{% url 'logout' %}">
@@ -45,10 +43,10 @@
       <a class="{% activo '/facturas/' %}" href="{% url 'panel:documentos' %}">{% icono "factura" %} Facturas</a>
       <a class="{% activo '/clientes/' %}" href="{% url 'panel:clientes' %}">{% icono "clientes" %} Clientes</a>
       <a class="{% activo '/productos/' %}" href="{% url 'panel:productos' %}">{% icono "productos" %} Productos</a>
-      <div class="nav__titulo">Configuración</div>
-      <a class="{% activo '/configuracion/' %}" href="{% url 'panel:empresa' %}">{% icono "empresa" %} Mi empresa</a>
       {% if user.is_superuser %}
-      <a href="{% url 'admin:index' %}">{% icono "admin" %} Administración</a>
+      <div class="nav__titulo">Configuración</div>
+      <a class="{% activo '/configuracion/empresa/' %}" href="{% url 'panel:empresa' %}">{% icono "empresa" %} Mi empresa</a>
+      <a class="{% activo '/configuracion/usuarios/' %}" href="{% url 'panel:usuarios' %}">{% icono "clientes" %} Usuarios</a>
       {% endif %}
     </nav>
   </aside>

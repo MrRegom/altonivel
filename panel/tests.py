@@ -1,3 +1,4 @@
+import os
 import shutil
 import tempfile
 from decimal import Decimal
@@ -20,7 +21,7 @@ class PanelTests(TestCase):
         ajuste.enable()
         self.addCleanup(ajuste.disable)
 
-        self.user = User.objects.create_user("vendedor", password="x")
+        self.user = User.objects.create_superuser("11111111-1", password="x", first_name="Admin")
         self.client.force_login(self.user)
         EmpresaEmisora.objects.create(
             rut="76795561-8", razon_social="EMPRESA DEMO SPA", giro="SERVICIOS",
@@ -149,3 +150,82 @@ class PanelTests(TestCase):
     def test_campo_rut_marcado_para_validador(self):
         resp = self.client.get(reverse("panel:cliente_nuevo"))
         self.assertContains(resp, "data-rut")
+
+
+class UsuariosYAccesoTests(TestCase):
+    CLAVE = "Clave-Segura-2026"
+
+    def setUp(self):
+        self.admin = User.objects.create_superuser("16233406-9", password=self.CLAVE, first_name="Reinaldo")
+        self.vendedor = User.objects.create_user("12345678-5", password=self.CLAVE, first_name="Vendedor")
+
+    def test_ingreso_con_rut_en_cualquier_formato(self):
+        for rut in ["16233406-9", "16.233.406-9", "162334069"]:
+            with self.subTest(rut=rut):
+                resp = self.client.post(reverse("login"), {"username": rut, "password": self.CLAVE})
+                self.assertRedirects(resp, reverse("panel:inicio"))
+                self.client.logout()
+
+    def test_ingreso_rechaza_rut_invalido_y_clave_incorrecta(self):
+        resp = self.client.post(reverse("login"), {"username": "16233406-8", "password": self.CLAVE})
+        self.assertContains(resp, "El RUT no es válido")
+        resp = self.client.post(reverse("login"), {"username": "16233406-9", "password": "otra"})
+        self.assertContains(resp, "RUT o contraseña incorrectos")
+
+    def test_vendedor_no_accede_a_configuracion(self):
+        self.client.force_login(self.vendedor)
+        for nombre in ["panel:usuarios", "panel:usuario_nuevo", "panel:empresa"]:
+            with self.subTest(nombre=nombre):
+                self.assertRedirects(self.client.get(reverse(nombre)), reverse("panel:inicio"))
+        self.assertNotContains(self.client.get(reverse("panel:inicio")), "Usuarios</a>")
+
+    def test_admin_crea_usuario_que_ingresa_con_rut(self):
+        self.client.force_login(self.admin)
+        datos = {"rut": "7.654.321-6", "rol": "vendedor", "first_name": "Ana", "last_name": "Pérez",
+                 "email": "ana@ejemplo.cl", "clave1": "Otra-Clave-2026", "clave2": "Otra-Clave-2026"}
+        resp = self.client.post(reverse("panel:usuario_nuevo"), datos)
+        self.assertRedirects(resp, reverse("panel:usuarios"))
+        nuevo = User.objects.get(username="7654321-6")
+        self.assertFalse(nuevo.is_superuser)
+        self.client.logout()
+        resp = self.client.post(reverse("login"), {"username": "76543216", "password": "Otra-Clave-2026"})
+        self.assertRedirects(resp, reverse("panel:inicio"))
+
+    def test_validaciones_al_crear(self):
+        self.client.force_login(self.admin)
+        base = {"rol": "vendedor", "first_name": "X", "clave1": "Otra-Clave-2026", "clave2": "Otra-Clave-2026"}
+        resp = self.client.post(reverse("panel:usuario_nuevo"), {**base, "rut": "12.345.678-5"})
+        self.assertContains(resp, "Ya existe un usuario con este RUT")
+        resp = self.client.post(reverse("panel:usuario_nuevo"), {**base, "rut": "7654321-6", "clave2": "distinta"})
+        self.assertContains(resp, "Las contraseñas no coinciden")
+
+    def test_admin_no_puede_quitarse_su_rol(self):
+        self.client.force_login(self.admin)
+        datos = {"rut": "16233406-9", "rol": "vendedor", "first_name": "Reinaldo", "is_active": "on"}
+        resp = self.client.post(reverse("panel:usuario_editar", args=[self.admin.pk]), datos)
+        self.assertContains(resp, "No puedes quitarte el rol")
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.is_superuser)
+
+    def test_admin_cambia_clave_de_otro_usuario(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse("panel:usuario_clave", args=[self.vendedor.pk]),
+                                {"new_password1": "Nueva-Clave-2026", "new_password2": "Nueva-Clave-2026"})
+        self.assertRedirects(resp, reverse("panel:usuarios"))
+        self.vendedor.refresh_from_db()
+        self.assertTrue(self.vendedor.check_password("Nueva-Clave-2026"))
+
+    def test_mi_clave(self):
+        self.client.force_login(self.vendedor)
+        resp = self.client.post(reverse("panel:mi_clave"), {
+            "old_password": self.CLAVE, "new_password1": "Nueva-Clave-2026", "new_password2": "Nueva-Clave-2026"})
+        self.assertRedirects(resp, reverse("panel:inicio"))
+
+    def test_comando_admin_rut_convierte_superadmin_existente(self):
+        from django.core.management import call_command
+
+        User.objects.filter(pk=self.admin.pk).update(username="Reinaldo")
+        call_command("admin_rut", "16.233.406-9", stdout=open(os.devnull, "w"))
+        self.admin.refresh_from_db()
+        self.assertEqual(self.admin.username, "16233406-9")
+        self.assertTrue(self.admin.is_superuser)

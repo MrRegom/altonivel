@@ -103,6 +103,11 @@ body.ingreso {
 }
 .acceso__campo input:focus { border-color: var(--naranjo); background: #fff; box-shadow: 0 0 0 4px rgba(249, 82, 11, .14); outline: none; }
 .acceso__campo:focus-within > svg.icono { color: var(--naranjo); }
+/* Aviso del validador de RUT bajo el campo (sin mover el ícono) */
+.acceso__campo .rut-estado { position: absolute; left: 2px; top: 100%; margin-top: 3px; font-family: var(--cuerpo); }
+.acceso__campo:has(.rut-estado:not(:empty)) { margin-bottom: 30px; }
+.acceso__campo input.rut-ok { border-color: #16864a; box-shadow: 0 0 0 4px rgba(22, 134, 74, .12); }
+.acceso__campo input.rut-mal { border-color: #cf3434; box-shadow: 0 0 0 4px rgba(207, 52, 52, .12); }
 .acceso__ojo { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px;
   display: grid; place-items: center; border: 0; background: none; border-radius: 8px; color: var(--tenue); cursor: pointer; }
 .acceso__ojo:hover { background: var(--gris-suave); color: var(--texto); }

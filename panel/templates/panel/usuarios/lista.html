@@ -1,0 +1,43 @@
+{% extends "panel/base.html" %}
+{% load panel_tags %}
+{% block titulo %}Usuarios{% endblock %}
+{% block miga %}<div class="miga">Configuración</div>{% endblock %}
+{% block encabezado %}Usuarios{% endblock %}
+{% block subtitulo %}<div class="subtitulo">Personas que pueden ingresar al sistema con su RUT y contraseña.</div>{% endblock %}
+{% block acciones %}<a class="btn btn--primario" href="{% url 'panel:usuario_nuevo' %}">Nuevo usuario</a>{% endblock %}
+
+{% block contenido %}
+<form class="herramientas" method="get">
+  <div class="buscador">{% icono "buscar" %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, RUT o correo…"></div>
+</form>
+
+<section class="card">
+  {% if pagina.object_list %}
+  <div class="tabla-wrap">
+    <table class="tabla tabla--click">
+      <thead><tr><th>Nombre</th><th>RUT</th><th class="ocultar-movil">Correo</th><th>Rol</th><th>Estado</th><th class="ocultar-movil">Último ingreso</th><th></th></tr></thead>
+      <tbody>
+      {% for u in pagina %}
+        <tr data-href="{% url 'panel:usuario_editar' u.pk %}">
+          <td class="principal-celda"><a href="{% url 'panel:usuario_editar' u.pk %}">{{ u.get_full_name|default:"(sin nombre)" }}</a>{% if u.pk == user.pk %}<span class="sub">Tú</span>{% endif %}</td>
+          <td class="nowrap tabular">{{ u.username|rut }}</td>
+          <td class="ocultar-movil">{{ u.email|default:"—" }}</td>
+          <td>{% if u.is_superuser %}<span class="badge badge--naranjo">Administrador</span>{% else %}<span class="badge badge--azul">Vendedor</span>{% endif %}</td>
+          <td>{% if u.is_active %}<span class="badge badge--verde">Activo</span>{% else %}<span class="badge badge--gris">Inactivo</span>{% endif %}</td>
+          <td class="ocultar-movil tenue">{{ u.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</td>
+          <td class="num"><a class="btn btn--sm" href="{% url 'panel:usuario_clave' u.pk %}">Cambiar contraseña</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "panel/_paginacion.html" %}
+  {% else %}
+  <div class="vacio">
+    {% icono "clientes" %}
+    <h3>{% if q %}Sin resultados para «{{ q }}»{% else %}No hay usuarios{% endif %}</h3>
+    <p><a href="{% url 'panel:usuarios' %}">Ver todos</a></p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
