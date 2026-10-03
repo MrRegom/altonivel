@@ -29,18 +29,12 @@
       <div class="galaxia__barra"><span></span><span></span></div>
       <h2 class="galaxia__titulo"><img src="{% static 'panel/img/logotipo-claro.png' %}" alt="Alto Nivel"></h2>
       <p class="galaxia__lema">Cotizaciones y facturación electrónica en un solo lugar.</p>
-      <ul class="galaxia__chips">
-        <li style="--i:0">{% icono "cotizacion" %} Cotiza en segundos</li>
-        <li style="--i:1">{% icono "rayo" %} Factura al SII</li>
-        <li style="--i:2">{% icono "enviar" %} Envía por correo</li>
-      </ul>
     </div>
   </section>
 
   <main class="acceso">
     <header class="acceso__cab">
       <img class="acceso__logotipo" src="{% static 'panel/img/logotipo.png' %}" alt="{{ marca_nombre }}">
-      <span class="acceso__etiqueta">Facturación</span>
     </header>
 
     <div class="acceso__cuerpo">
@@ -80,7 +74,6 @@
 
     <footer class="acceso__pie">
       <span>© {% now "Y" %} Alto Nivel</span>
-      <span class="acceso__sii"><span class="punto"></span> Integrado con el SII</span>
     </footer>
   </main>
 

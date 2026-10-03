@@ -75,36 +75,6 @@ body.ingreso {
 @keyframes entrar { from { opacity: 0; transform: translateY(16px); } }
 
 .galaxia__lema { margin: 18px 0 22px; font-size: 18px; color: rgba(255, 255, 255, .78); max-width: 460px; }
-.galaxia__chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.galaxia__chips li {
-  position: relative; overflow: hidden;
-  animation: chip-entrar .7s cubic-bezier(.2, .8, .2, 1) both, chip-flotar 4.5s ease-in-out infinite;
-  animation-delay: calc(.6s + var(--i) * .18s), calc(1.4s + var(--i) * .7s);
-  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
-  font-size: 13.5px; font-weight: 700; color: #e6ecf5;
-  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
-  backdrop-filter: blur(6px);
-}
-.galaxia__chips li svg.icono { width: 15px; height: 15px; color: var(--naranjo);
-  animation: chip-icono 3s ease-in-out infinite; animation-delay: calc(var(--i) * 1s); }
-/* Borde luminoso que gira alrededor de cada etiqueta */
-.galaxia__chips li::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
-  background: conic-gradient(from var(--giro, 0deg), transparent 0 70%, var(--naranjo) 80%, var(--celeste) 90%, transparent 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: chip-borde 4s linear infinite; animation-delay: calc(var(--i) * -1.3s); }
-/* Brillo que cruza la etiqueta */
-.galaxia__chips li::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .18), transparent); transform: skewX(-20deg);
-  animation: chip-brillo 5s ease-in-out infinite; animation-delay: calc(2s + var(--i) * .6s); }
-@property --giro { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes chip-entrar { from { opacity: 0; transform: translateY(14px) scale(.96); } }
-@keyframes chip-flotar { 50% { transform: translateY(-5px); } }
-@keyframes chip-icono { 0%, 100% { transform: scale(1) rotate(0); } 15% { transform: scale(1.25) rotate(-12deg); } 30% { transform: scale(1) rotate(0); } }
-@keyframes chip-borde { to { --giro: 360deg; } }
-@keyframes chip-brillo { 0%, 70% { left: -60%; } 100% { left: 130%; } }
-.galaxia__lema { animation: entrar .9s cubic-bezier(.2, .8, .2, 1) both .4s; }
-.galaxia__chips li:hover { background: rgba(249, 82, 11, .14); border-color: rgba(249, 82, 11, .5); }
 
 /* ---------- Panel de acceso ---------- */
 .acceso {
@@ -113,8 +83,6 @@ body.ingreso {
 }
 .acceso__cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .acceso__logotipo { height: 26px; width: auto; }
-.acceso__etiqueta { font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--naranjo); padding: 5px 10px; border-radius: 999px; background: var(--naranjo-suave); }
 
 .acceso__cuerpo { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 380px; width: 100%; margin: 0 auto;
   animation: aparecer .8s cubic-bezier(.2, .8, .2, 1) both .15s; }
@@ -160,11 +128,7 @@ body.ingreso {
 @keyframes destello { 0%, 70% { left: -60%; } 100% { left: 130%; } }
 .acceso__boton.cargando { pointer-events: none; opacity: .85; }
 
-.acceso__pie { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--tenue); }
-.acceso__sii { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
-.acceso__sii .punto { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
-  animation: pulso 2s infinite; }
-@keyframes pulso { 70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+.acceso__pie { display: flex; justify-content: flex-start; gap: 12px; font-size: 12.5px; color: var(--tenue); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
@@ -180,8 +144,7 @@ body.ingreso {
   .acceso { min-height: 100vh; background: transparent; box-shadow: none; padding: 24px 16px; justify-content: center; }
   .acceso__cab { justify-content: center; }
   .acceso__logotipo { filter: brightness(0) invert(1); }
-  .acceso__etiqueta { display: none; }
-  .acceso__cuerpo { flex: none; margin: 72px auto 28px; background: #fff; border-radius: 20px; padding: 30px 22px 26px;
+    .acceso__cuerpo { flex: none; margin: 72px auto 28px; background: #fff; border-radius: 20px; padding: 30px 22px 26px;
     box-shadow: 0 30px 80px rgba(0, 0, 0, .5); max-width: 420px; }
   .acceso__dragon-movil { display: block; width: 72px; height: 72px; border-radius: 18px; margin: -66px auto 14px;
     border: 4px solid #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, .4); }
@@ -193,6 +156,4 @@ body.ingreso {
 @media (prefers-reduced-motion: reduce) {
   /* Solo se apagan las entradas deslizantes; los efectos suaves se mantienen. */
   .galaxia__titulo, .galaxia__lema, .acceso__cuerpo { animation: none !important; }
-  .galaxia__chips li { animation: chip-flotar 4.5s ease-in-out infinite !important;
-    animation-delay: calc(var(--i) * .7s) !important; }
 }
