@@ -8,15 +8,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'panel/app.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'panel/img/favicon.png' %}">
 </head>
 <body>
   <div class="login">
     <div class="login__caja">
       <div class="login__marca">
-        {% include "panel/_escudo.html" %}
-        <span><span class="marca__nombre" style="font-size:24px">{{ marca_nombre }}</span><span class="marca__sub">Cotizaciones y facturación</span></span>
+        <img class="login__dragon" src="{% static 'panel/img/logo.png' %}" alt="">
       </div>
       <div class="login__card">
+        <img class="login__logotipo" src="{% static 'panel/img/logotipo.png' %}" alt="{{ marca_nombre }}">
         <h1>Bienvenido</h1>
         <p>Ingresa con tu usuario para continuar.</p>
         {% if form.non_field_errors %}
@@ -36,7 +37,7 @@
           <button type="submit" class="btn btn--primario btn--bloque" style="padding:12px">Ingresar {% icono "flecha" %}</button>
         </form>
       </div>
-      <div class="login__pie">Facturación electrónica integrada con el SII</div>
+      <div class="login__pie">Cotizaciones y facturación electrónica integrada con el SII</div>
     </div>
   </div>
 </body>

@@ -30,8 +30,8 @@
   <table>
     <tr>
       <td style="width: 60%; vertical-align: middle;">
-        {% if logo %}<img src="{{ logo }}" style="height: 60px;"><br>{% endif %}
-        <span class="marca">{% if empresa %}{{ empresa.nombre_visible|upper }}{% else %}ALTO NIVEL{% endif %}</span><br>
+        {% if logo %}<img src="{{ logo }}" style="height: 34px;"><br><br>
+        {% else %}<span class="marca">{% if empresa %}{{ empresa.nombre_visible|upper }}{% else %}ALTO NIVEL{% endif %}</span><br>{% endif %}
         {% if empresa %}
         <span class="sub">{{ empresa.razon_social }} · RUT {{ empresa.rut|rut }}<br>
         {{ empresa.giro }}<br>

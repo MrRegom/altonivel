@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'panel/app.css' %}">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 42'%3E%3Cpath d='M19 1 2 7v12c0 10.2 7.1 18.4 17 22 9.9-3.6 17-11.8 17-22V7z' fill='%23f9520b'/%3E%3Cpath d='M11 25.5 19 12l8 13.5z' fill='%23161725'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="{% static 'panel/img/favicon.png' %}">
 </head>
 <body>
 <div class="app">
@@ -17,7 +17,7 @@
       {% if marca_logo %}
         <img class="marca__logo" src="{{ marca_logo }}" alt="{{ marca_nombre }}">
       {% else %}
-        {% include "panel/_escudo.html" %}
+        <img class="marca__dragon" src="{% static 'panel/img/logo.png' %}" alt="">
         <span><span class="marca__nombre">{{ marca_nombre }}</span><span class="marca__sub">Facturación</span></span>
       {% endif %}
     </a>

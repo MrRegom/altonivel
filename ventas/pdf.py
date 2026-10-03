@@ -14,6 +14,9 @@ from django.template.loader import render_to_string
 
 
 def _logo_path():
+    """Logo subido en "Mi empresa" o, si no hay, el logotipo de Alto Nivel."""
+    from django.contrib.staticfiles import finders
+
     from facturacion.models import EmpresaEmisora
 
     empresa = EmpresaEmisora.objects.first()
@@ -21,7 +24,7 @@ def _logo_path():
         ruta = Path(empresa.logo.path)
         if ruta.exists():
             return empresa, str(ruta)
-    return empresa, None
+    return empresa, finders.find("panel/img/logotipo.png")
 
 
 def cotizacion_html(cotizacion) -> str:
